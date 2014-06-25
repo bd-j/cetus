@@ -4,13 +4,13 @@
 
 import sys, getopt, os, time
 import numpy as np
-from emcee.utils import MPIPool
 import gp
 import fsps
 
 sps = fsps.StellarPopulation(add_agb_dust_model = True)
 wave = sps.wavelengths
 sigma = np.random.uniform(size =len(wave))
+#gap = gp.GaussianProcess(wave, sigma)
 
 rp = { 'outfile':'test_mpi.dat'}
 
@@ -28,18 +28,26 @@ def test2(tage, sps =None):
 
 start = time.time()
 
-if __name__ == "__main__":
-
+try:
+    from emcee.utils import MPIPool
     pool = MPIPool(debug = True)
-    print(pool.rank, pool.size)
+    M = pool.map
     if not pool.is_master():
         # Wait for instructions from the master process.
         pool.wait()
         sys.exit(0)
+   
+except ImportError:
+    pool = None
+    M = map
+
+if __name__ == "__main__":
+
  
 
     gap = gp.GaussianProcess(wave, sigma)
-    M = pool.map
+    a, s, l = 0.1, 0.0, 0.1
+    gap.factor(s, a, l)
     #M = map
 
     j = list(M(test, [[i, gap] for i in range(32)]))

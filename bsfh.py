@@ -5,11 +5,12 @@ import numpy as np
 import pickle
 
 import sps_basis
-import bsfh_model
-import bsfh_utils as utils
+import modeldef
+import fitterutils as utils
 
 #SPS Model as global
-sps = sps_basis.StellarPopBasis(smooth_velocity = fixed_params['smooth_velocity'])
+smooth_velocity = False
+sps = sps_basis.StellarPopBasis(smooth_velocity = smooth_velocity)
 
 #LnP function as global
 def lnprobfn(theta, mod):
@@ -23,7 +24,7 @@ def lnprobfn(theta, mod):
         
         # Generate model
         t1 = time.time()        
-        spec, phot, x = mod.model(theta, sps = sps)
+        spec, phot, x = mod.mean_model(theta, sps = sps)
         d1 = time.time() - t1
 
         # Spectroscopy term
@@ -47,37 +48,29 @@ def lnprobfn(theta, mod):
     else:
         return -np.infty
     
-def chi2(args):
-    """
-    A sort of chi2 function that allows for maximization of lnP using
-    minimization routines.
-    """
-    theta, model = args
-    return -lnprobfn(theta, model)
-
-# Run parameters
-rp = {'verbose':True,
-      #data
-      'filename':'data/mmt/nocal/020.B192-G242.s.fits', 'objname': 'B192-G242',
-      'wlo':3750., 'whi': 7200.,
-      'loader': 'load_obs_mmt',
-      #model
-      'param_file':'bsfh.params',
-      #for minimization
-      'ftol':1e-6, 'maxfev':50000, 'nsamplers':1,
-      #for emcee sampling
-      'walker_factor':8,'nthreads':1, 'nburn':3 * [50], 'niter': 200, 'initial_disp':0.01
-      #for MPI
-      'np':1
-      }
-
-fc = os.path.basename(rp['filename']).split('.')
-rp['outfile'] = 'results/' + 'test_{0}{2}_{1}'.format(fc[1].lower(), fc[0], fc[2]) 
+def chi2(theta, mod):
+    return -lnprobfn(theta, mod)
 
 
+#MPI pool.  This must be done *after* lnprob and and
+# chi2 are defined since slaves will only see up to
+# sys.exit()
+try:
+    from emcee.utils import MPIPool
+    pool = MPIPool(debug = False, loadbalance = True)
+    if not pool.is_master():
+        # Wait for instructions from the master process.
+        pool.wait()
+        sys.exit(0)
+except(ValueError):
+    pool = None
+
+    
 if __name__ == "__main__":
 
-    rp = utils.parse_args(sys.argv,rp)
+    #parlist, rp = modeldef.json_to_pars(filename)
+    parlist, rp = modeldef.parlist, modeldef.rp
+    rp = utils.parse_args(sys.argv, rp)
 
     ############
     # LOAD DATA
@@ -97,21 +90,31 @@ if __name__ == "__main__":
     if rp['verbose']:
         print('Setting up model')
 
-    model, initial_center = bsfh_model.initialize_model(rp, obs)
-
+    model, initial_center = modeldef.initialize_model(rp, parlist, obs)
+    model.params['smooth_velocity'] = smooth_velocity
+    rp['ndim'] = model.ndim
+    
     #################
     #INITIAL GUESS USING POWELL MINIMIZATION
     #################
     #sys.exit()
     if rp['verbose']:
         print('Minimizing')
+        ts = time.time()
 
     powell_opt = {'ftol': rp['ftol'],
-                  'xtol':1e-6,
-                  'maxfev':rp['maxfev']}
-    powell_guesses, pinit = utils.parallel_minimize(model, sps, chi2, initial_center, rp, powell_opt, pool = pool)
+                'xtol':1e-6,
+                'maxfev':rp['maxfev']}
+        
+    nthreads = rp['nthreads']
+    powell_guesses, pinit = utils.pminimize(chi2, model, initial_center,
+                                       method ='powell', opts =powell_opt,
+                                       pool = pool, nthreads = rp['nthreads'])
+    
     best = np.argmin([p.fun for p in powell_guesses])
-    powell_guess = powell_guesses[best]
+    best_guess = powell_guesses[best]
+    if rp['verbose']:
+        print('done Powell in {0}s'.format(time.time()-ts))
 
     ###################
     #SAMPLE
@@ -124,7 +127,7 @@ if __name__ == "__main__":
 
     tstart = time.time()
     theta_init = initial_center
-    initial_center = powell_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
+    initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
     esampler = utils.run_a_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
 
@@ -134,21 +137,25 @@ if __name__ == "__main__":
     results = {}
     results['run_params'] = rp
     results['obs'] = model.obs
-    results['theta'] = model.theta_desc
+    #results['theta'] = model.theta_desc
     results['initial_center'] = initial_center
     results['chain'] = esampler.chain
     results['lnprobability'] = esampler.lnprobability
     results['acceptance'] = esampler.acceptance_fraction
     results['duration'] = edur
     results['model'] = model
-    results['gp'] = gp
+    #results['gp'] = gp
     results['powell'] = powell_guess
-    results['init_theta'] = theta_init
+    results['initial_theta'] = theta_init
     #pull out the git hash for bsfh here.
-    gh = fitterutils.run_command('cd ~/Codes/SEDfitting/bsfh/\n git rev-parse HEAD')[1][0].replace('\n','')
+    gh = utils.run_command('cd ~/Codes/SEDfitting/bsfh/\n git rev-parse HEAD')[1][0].replace('\n','')
     results['bsfh_version'] = gh
 
     out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(int(time.time()), rp['outfile'], 1), 'wb')
     pickle.dump(results, out)
     out.close()
-
+    
+    try:
+        pool.close()
+    except:
+        pass
