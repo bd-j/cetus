@@ -15,8 +15,8 @@ sps = sps_basis.StellarPopBasis(smooth_velocity = smooth_velocity)
 #LnP function as global
 def lnprobfn(theta, mod):
     """
-    Wrapper on the model instance method, defined here
-    globally to enable multiprocessing.
+    Given a model object and a parameter vector, return the ln of the
+    posterior.
     """
     lnp_prior = mod.prior_product(theta)
     if np.isfinite(lnp_prior):
@@ -42,8 +42,8 @@ def lnprobfn(theta, mod):
         lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var ).sum()
         lnp_phot +=  np.log(2*np.pi*phot_var).sum()
 
-        print('model calc = {0}s, lnlike calc = {1}'.format(d1,d2))
-        print('lnp = {0}, lnp_spec = {1}, lnp_phot = {2}'.format(lnp_spec + lnp_phot + lnp_prior, lnp_spec, lnp_phot))
+        #print('model calc = {0}s, lnlike calc = {1}'.format(d1,d2))
+        #print('lnp = {0}, lnp_spec = {1}, lnp_phot = {2}'.format(lnp_spec + lnp_phot + lnp_prior, lnp_spec, lnp_phot))
         return lnp_prior + lnp_phot + lnp_spec
     else:
         return -np.infty
@@ -122,19 +122,18 @@ if __name__ == "__main__":
     #sys.exit()
     if rp['verbose']:
         print('emcee...')
-
-    nsamplers = int(rp['nsamplers'])
-
     tstart = time.time()
+    
+    #nsamplers = int(rp['nsamplers'])
     theta_init = initial_center
     initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
-    esampler = utils.run_a_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
+    esampler = utils.run_emcee_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
 
     ###################
     # PICKLE OUTPUT
     ###################
-    results = {}
+    results, modelstore = {}, {}
     results['run_params'] = rp
     results['obs'] = model.obs
     #results['theta'] = model.theta_desc
@@ -143,16 +142,22 @@ if __name__ == "__main__":
     results['lnprobability'] = esampler.lnprobability
     results['acceptance'] = esampler.acceptance_fraction
     results['duration'] = edur
-    results['model'] = model
-    #results['gp'] = gp
-    results['powell'] = powell_guess
+    results['powell'] = powell_guesses
     results['initial_theta'] = theta_init
+    
+    model_store['model'] = model
+    #rmodel_store['gp'] = gp
     #pull out the git hash for bsfh here.
     gh = utils.run_command('cd ~/Codes/SEDfitting/bsfh/\n git rev-parse HEAD')[1][0].replace('\n','')
     results['bsfh_version'] = gh
+    model_store['bsfh_version'] = gh
 
     out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(int(time.time()), rp['outfile'], 1), 'wb')
     pickle.dump(results, out)
+    out.close()
+
+    out = open('{1}_{0}.sampler{2:02d}_model'.format(int(time.time()), rp['outfile'], 1), 'wb')
+    pickle.dump(model_store, out)
     out.close()
     
     try:
