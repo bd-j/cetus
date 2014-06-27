@@ -20,7 +20,7 @@ def lnprobfn(theta, mod):
     """
     lnp_prior = mod.prior_product(theta)
     if np.isfinite(lnp_prior):
-        print(theta)
+        
         
         # Generate model
         t1 = time.time()        
@@ -42,15 +42,19 @@ def lnprobfn(theta, mod):
         lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var ).sum()
         lnp_phot +=  np.log(2*np.pi*phot_var).sum()
 
-        #print('model calc = {0}s, lnlike calc = {1}'.format(d1,d2))
-        #print('lnp = {0}, lnp_spec = {1}, lnp_phot = {2}'.format(lnp_spec + lnp_phot + lnp_prior, lnp_spec, lnp_phot))
+        if mod.verbose:
+            #if d2 > 0.1:
+            print(theta)
+            print('model calc = {0}s, lnlike calc = {1}'.format(d1,d2))
+            fstring = 'lnp = {0}, lnp_spec = {1}, lnp_phot = {2}'
+            values = [lnp_spec + lnp_phot + lnp_prior, lnp_spec, lnp_phot]
+            print(fstring.format(*values))
         return lnp_prior + lnp_phot + lnp_spec
     else:
         return -np.infty
     
 def chi2(theta, mod):
     return -lnprobfn(theta, mod)
-
 
 #MPI pool.  This must be done *after* lnprob and and
 # chi2 are defined since slaves will only see up to
@@ -68,10 +72,12 @@ except(ValueError):
     
 if __name__ == "__main__":
 
-    #parlist, rp = modeldef.json_to_pars(filename)
-    parlist, rp = modeldef.parlist, modeldef.rp
-    rp = utils.parse_args(sys.argv, rp)
-
+    #inpar = utils.parse_args(sys.argv)
+    #rp, parlist = modeldef.read_plist(inpar['param_file'])
+    parlist, rp = modeldef.default_parlist, modeldef.rp
+    #print(type(rp), len(rp))
+    #rp = utils.parse_args(sys.argv, rp = rp)
+    #sys.exit()
     ############
     # LOAD DATA
     ##############
@@ -133,7 +139,7 @@ if __name__ == "__main__":
     ###################
     # PICKLE OUTPUT
     ###################
-    results, modelstore = {}, {}
+    results, model_store = {}, {}
     results['run_params'] = rp
     results['obs'] = model.obs
     #results['theta'] = model.theta_desc
@@ -142,9 +148,9 @@ if __name__ == "__main__":
     results['lnprobability'] = esampler.lnprobability
     results['acceptance'] = esampler.acceptance_fraction
     results['duration'] = edur
-    results['powell'] = powell_guesses
     results['initial_theta'] = theta_init
-    
+
+    model_store['powell'] = powell_guesses
     model_store['model'] = model
     #rmodel_store['gp'] = gp
     #pull out the git hash for bsfh here.
