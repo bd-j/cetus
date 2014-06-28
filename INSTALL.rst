@@ -1,8 +1,13 @@
 Installation (on Hyades)
 =====
 
-You need to install several packages.  Also, you will need 
-numpy, scipy, mpi4py, emcee, and some form of pyfits
+You need to install several packages.  Also, you will need numpy,
+scipy, mpi4py, emcee, and some form of pyfits.  You should make a
+directory called something like pyapps or cetusapps or something.  We
+are going to put .pth redirects into this directory, and then add this
+directory to the PYTHONPATH environment variable, so that python can
+find all of these distributions. 
+
 
 1. First, make a directory in home/pfs for applications
 2. Install FSPS.
@@ -28,6 +33,6 @@ numpy, scipy, mpi4py, emcee, and some form of pyfits
 5. bsfh
    a. `git clone https://github.com/bd-j/bsfh`
 
-6. Syntax
-   a. python bsfh.py --paramfile = <param file>
-   b. mpirun -np 4 python bsfh.py --param_file
+6. command line yntax
+   a. python bsfh.py --param_file = <param file>
+   b. mpirun -np 4 python bsfh.py --param_file <param_file>

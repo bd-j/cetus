@@ -21,7 +21,6 @@ def lnprobfn(theta, mod):
     lnp_prior = mod.prior_product(theta)
     if np.isfinite(lnp_prior):
         
-        
         # Generate model
         t1 = time.time()        
         spec, phot, x = mod.mean_model(theta, sps = sps)
@@ -72,9 +71,9 @@ except(ValueError):
     
 if __name__ == "__main__":
 
-    #inpar = utils.parse_args(sys.argv)
-    #rp, parlist = modeldef.read_plist(inpar['param_file'])
-    parlist, rp = modeldef.default_parlist, modeldef.rp
+    inpar = utils.parse_args(sys.argv)
+    rp, parlist = modeldef.read_plist(inpar['param_file'])
+    #parlist, rp = modeldef.default_parlist, modeldef.rp
     #print(type(rp), len(rp))
     #rp = utils.parse_args(sys.argv, rp = rp)
     #sys.exit()
