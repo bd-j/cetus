@@ -6,7 +6,7 @@ scipy, mpi4py, emcee, and some form of pyfits.  You should make a
 directory called something like pyapps or cetusapps or something.  We
 are going to put .pth redirects into this directory, and then add this
 directory to the PYTHONPATH environment variable, so that python can
-find all of these distributions. 
+find all of these distributions.
 
 
 1. First, make a directory in home/pfs for applications
@@ -19,7 +19,11 @@ find all of these distributions.
    e. `make all`  you will get some warnings.
    e. smoke test by running `./simple.exe`
 
-3. Install python-FSPS.  Note that this will use f2py, which presumably exists and uses an ifort compiler.  Anyway, it is important that both FSPS and python-FSPS use the same fortran compiler.  I have had success using the default compiler options, `-cpp -fPIC`
+3. Install python-FSPS.  Note that this will use f2py, which
+   presumably exists and uses an ifort compiler.  Anyway, it is
+   important that both FSPS and python-FSPS use the same fortran
+   compiler.  I have had success using the default compiler options,
+   `-cpp -fPIC`
    a. `git clone https://github.com/bd-j/python-fsps`
    b. `cd python-fsps`
    c. `python setup.py build_fsps` which barfs lots of stuff, but if the last line is 'removing build directory' then you are golden.
@@ -33,6 +37,6 @@ find all of these distributions.
 5. bsfh
    a. `git clone https://github.com/bd-j/bsfh`
 
-6. command line yntax
+6. command line syntax
    a. python bsfh.py --param_file = <param file>
    b. mpirun -np 4 python bsfh.py --param_file <param_file>
