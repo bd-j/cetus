@@ -13,7 +13,7 @@ find all of these distributions.
 
 1. Install FSPS. 
 
-In the ``~/pfs/`` directory:
+    In the ``~/pfs/`` directory:
     a. ``svn checkout http://fsps.googlecode.com/svn/trunk/ fsps``
     b. ``export SPS_HOME="/Path/to/fsps/directory/"``
     c. ``cd fsps/src/``
@@ -28,10 +28,10 @@ In the ``~/pfs/`` directory:
 
 3. Install python-FSPS.
 
-This will use f2py, which presumably exists (installed with
-numpy) and uses an ifort compiler.  Anyway, it is important that both
-FSPS and python-FSPS use the same fortran compiler.  I have had
-success using the default compiler options, ``-cpp -fPIC``.
+    This will use f2py, which presumably exists (installed with
+    numpy) and uses an ifort compiler.  Anyway, it is important that both
+    FSPS and python-FSPS use the same fortran compiler.  I have had
+    success using the default compiler options, ``-cpp -fPIC``.
 
     a. ``git clone https://github.com/bd-j/python-fsps``
     b. ``cd python-fsps``
@@ -39,8 +39,7 @@ success using the default compiler options, ``-cpp -fPIC``.
     d.  do something to put this on the python path
 
 4. Install sedpy 
-
-(for dust and filter projections)
+    (for dust and filter projections)
 
     a. ``git clone https://github.com/bd-j/sedpy``
     b. ``cd sedpy/``
