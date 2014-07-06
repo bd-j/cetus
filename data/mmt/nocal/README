@@ -1,0 +1,20 @@
+Here you go. The files have been  named for the objects - the original files often had
+different names, so the "Object" keyword in the files will often be different - ignore that.
+Many of the objects were observed more than once, I give you the separate files - what you
+have been working with were the combined files (not to mention the flux calibration and
+deredshifting).  Each observation has three separate files, at various states of reduction. For instance:
+
+011.B380-G313.v.fits contains the sky subtracted, linearized spectrum, with variance and sky as separate rows
+011.B380-G313.s.fits is that with flux calibration applied
+011.B380-G313.z.fits is that with the wavelength calibration adjusted for redshift (no rebinning
+has been applied, which was the case for the spectra you have been working with).
+
+You'll note as I just did that these don't look as good as the web pictures. The latter were smoothed
+for presentation.
+
+I am having some of these spectra re-reduced with our new SDSS-like pipeline, which will also
+give versions in which rebinning has not occurred.  I'll send those along when ready.
+
+I'm happy to send you many, many more spectra, when you are ready!
+
+nc 

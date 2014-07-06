@@ -1,0 +1,41 @@
+Begin forwarded message:
+
+> From: Cliff Johnson <lcjohnso@astro.washington.edu>
+> Subject: AP Catalogs: Photometry, ID Matching, Star Count Metadata
+> Date: February 20, 2014 at 2:11:01 AM PST
+> To: Daniel Weisz <drw@ucsc.edu>
+>
+> Hi Dan --
+>
+> Here's an AP data dump -- I've included a few comments below.
+>
+>
+> +AP Catalog and Photometry
+> f2_apcanfinal_6phot_v2.fits = This is the latest version of the AP catalog, including integrated photometry.  The "f2" label denotes this fact - second iteration of the full AP dataset (both rounds of data collection), as opposed to the last major set of AP IDs that were tied to "d4" - the fourth iteration of the original AP Round 1 classifications.
+>
+> Note on Object Selection: This catalog contains -ALL- AP objects that were identified by at least 20% of classifiers.  To select a sample of clusters, first calculate ClusterFrac = ViewFrac * (1-GalFrac).  Clusters are currently defined as: ClusterFrac >= 0.35 AND GalFrac < 0.2.  For a cleaner sample, bump the ClusterFrac threshold up to 0.7 -- at this level there will be almost zero contamination from single stars or other marginal cluster candidates.
+>
+> One note on the photometry: If DETSIG=0 and the corresponding MAG and SIG outputs are missing, that means there was no data available (ie - no image coverage in that wavelength).  If DETSIG=0 and there are entries in the MAG and SIG columns, this means that I did not detect any flux above the level of the sky, then the MAG column provides the sky level and SIG=0.75.
+>
+>
+> +ID Matching
+> f2_apmatch_known.fits = Matches AP IDs to Nelson's (and others) previously known cluster catalogs.  The file also includes boolean columns that provide the classification from the previous catalog -- not all are accurate according to our AP results.
+> f2_apmatch_yr1all.fits = Matches AP IDs to Yr1 PC IDs (Johnson et al. 2012).
+>
+>
+> +Star Count Metadata
+> clusterdata_apf2_v1.fits = Using the current CMD extractions from the 6-band catalogs, I derived some additional metadata for a subsample of the AP objects.  Not all 8k+ objects have entries here; subsample of likely clusters and objects with CMDs currently in hand -- this excludes tooth objects for the moment (v2 will happen sometime soon).
+>
+> The NMS_X columns are likely the most useful to you: number of MS stars (F475W-F814W < 1) brighter than F814W=X magnitude. Some of the other columns:
+> NSTAR = just as you think -- total number of detected sources in the photometry file.
+> BRIGHTSTAR = 5 brightest sources, defined by their F814W mags.
+> F475FULL = F475W integrated magnitude
+> F475MINUSX = integrated mag minus the X brightest stars (those listed in BRIGHTSTAR)
+> F475FRACX = fraction of the total integrated light made up by the X brightest stars.
+>
+>
+> Sorry if the column names/meanings are cryptic at times...  Hit me up if you have any questions!
+>
+> Cheers,
+> Cliff
+>
