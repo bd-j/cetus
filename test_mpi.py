@@ -51,9 +51,9 @@ if __name__ == "__main__":
     #M = map
 
     j = list(M(test, [[i, gap] for i in range(32)]))
-    pool.close()
 
     fn = open(rp['outfile'],'wb')
     for i in j:
         fn.write('{0} {1} {2} {3}\n'.format(*i))
     fn.close()
+    pool.close()

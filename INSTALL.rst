@@ -3,13 +3,13 @@ Installation (on Hyades)
 
 You need to install several packages.  Also, you will need numpy,
 scipy, mpi4py, emcee, and some form of pyfits.  You should make a
-directory called something like pyapps or cetusapps or something.  We
-are going to put .pth redirects into this directory, and then add this
+directory called something like site-packages in your pfs directory.  We
+are going to install all the extra modules to this directory, and then add this
 directory to the PYTHONPATH environment variable, so that python can
 find all of these distributions.
 
 
-1. First, make a directory in home/pfs for applications
+1. In ~/pfs mkdir site-packages
 2. Install FSPS.
    a. `svn checkout http://fsps.googlecode.com/svn/trunk/ fsps`
    b. `export SPS_HOME="/Path/to/fsps/directory/"`
