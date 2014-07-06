@@ -9,8 +9,10 @@ directory to the PYTHONPATH environment variable, so that python can
 find all of these distributions.
 
 
-1. In ~/pfs mkdir site-packages
-2. Install FSPS.
+
+
+1. Install FSPS. 
+In the ``~/pfs/`` directory:
     a. ``svn checkout http://fsps.googlecode.com/svn/trunk/ fsps``
     b. ``export SPS_HOME="/Path/to/fsps/directory/"``
     c. ``cd fsps/src/``
@@ -19,11 +21,15 @@ find all of these distributions.
     f. ``make all``  you will get some warnings.
     g. smoke test by running ``./simple.exe``
 
-3. Install python-FSPS.  Note that this will use f2py, which
-   presumably exists (installed with numpy) and uses an ifort
-   compiler.  Anyway, it is important that both FSPS and python-FSPS
-   use the same fortran compiler.  I have had success using the
-   default compiler options, ``-cpp -fPIC``
+2. Set up for python modules
+    a. ``cd ~/pfs; mkdir site-packages``
+    b.
+
+3. Install python-FSPS.  
+This will use f2py, which presumably exists (installed with
+numpy) and uses an ifort compiler.  Anyway, it is important that both
+FSPS and python-FSPS use the same fortran compiler.  I have had
+success using the default compiler options, ``-cpp -fPIC``.
     a. ``git clone https://github.com/bd-j/python-fsps``
     b. ``cd python-fsps``
     c. ``python setup.py build_fsps`` which barfs lots of stuff, but if the last line is 'removing build directory' then you are golden.
@@ -34,8 +40,12 @@ find all of these distributions.
     b. ``cd sedpy/``
     c. ``python setup.py install`` this will fail.  need to add this package (and others) to the python path
 
-5. bsfh
+5. Install bsfh
     a. ``git clone https://github.com/bd-j/bsfh``
+
+6. Install emcee
+
+7. Install cetus
 
 6. command line syntax
     a. python bsfh.py --param_file = <param file>
