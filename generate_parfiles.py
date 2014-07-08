@@ -1,4 +1,4 @@
-import os, glob
+import os, glob, copy
 import modeldef
 
 stat ='cal'
@@ -23,17 +23,19 @@ for f in files:
     name = '{0}.{2}.{1}'.format(obj.lower(), stat, exp)
     age = objage[obj]
     out = name
-    plist = default_plist[:]
+    plist = copy.deepcopy(default_plist)
     rp = default_rp
+    #print(plist[1]['prior_function'])
 
 
-    rp['verbose'] = False
+    rp['verbose'] = True
     rp['filename'] = f
     rp['objname'] = obj
     rp['outfile'] = 'results/' + name
     rp['maxfev'] = 5000
     rp['nburn'] = 3 * [100]
     rp['niter'] = 500
+    rp['walker_factor'] = 8
 
     tind = plist_names.index('tage') 
     plist[tind]['init'] = age

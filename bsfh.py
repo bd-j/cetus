@@ -55,7 +55,7 @@ def lnprobfn(theta, mod):
 def chi2(theta, mod):
     return -lnprobfn(theta, mod)
 
-#MPI pool.  This must be done *after* lnprob and and
+#MPI pool.  This must be done *after* lnprob and
 # chi2 are defined since slaves will only see up to
 # sys.exit()
 try:
