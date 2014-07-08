@@ -40,7 +40,12 @@ find them.
 	1. `cd ~/pfs/code/site-packages`
     2. `git clone https://github.com/bd-j/python-fsps`
     3. `cd python-fsps`
-    4. `python setup.py build_fsps` which barfs lots of text, but if the last line contains *removing build directory* then you are golden.
+    4. `python setup.py build_fsps` which barfs lots of text, but if
+       the last line contains *removing build directory* then you are
+       golden.
+    5. If you are using MPI, there is a change that needs to be made
+	    in `fsps.__init__.py`. Namely, you must comment out the FSPS
+	    revision check, which spawns a subprocess
 
 4. Install sedpy 
     (for dust and filter projections)
@@ -66,6 +71,10 @@ find them.
 7. command line syntax
 
 	This is what should go in the .pb scripts
+	Note that the ATLAS library that scipy uses to do the matrix
+	inversions will throw assertion errors if if it is not run on the hyper
+	queue. I think this is because ATLAS was compiled with that many
+	processors available, and freaks out if it finds fewer
 	
     1. `python bsfh.py --param_file  <param file>`
     2. `mpirun -np <np> python bsfh.py --param_file <param_file>`
