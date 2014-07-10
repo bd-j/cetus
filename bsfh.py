@@ -73,6 +73,7 @@ if __name__ == "__main__":
 
     inpar = utils.parse_args(sys.argv)
     rp, parlist = modeldef.read_plist(inpar['param_file'])
+    _, plist_string = modeldef.read_plist(inpar['param_file'], raw_json =True)
     rp['param_file'] = inpar['param_file']
     #parlist, rp = modeldef.default_parlist, modeldef.rp
     #print(type(rp), len(rp))
@@ -144,6 +145,7 @@ if __name__ == "__main__":
     results, model_store = {}, {}
     results['run_params'] = rp
     results['obs'] = model.obs
+    results['plist'] = plist_string
     #results['theta'] = model.theta_desc
     results['initial_center'] = initial_center
     results['initial_theta'] = theta_init
@@ -167,11 +169,11 @@ if __name__ == "__main__":
     model_store['bsfh_version'] = bgh
     
     tt = int(time.time())
-    out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(tt), rp['outfile'], 1), 'wb')
+    out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(tt, rp['outfile'], 1), 'wb')
     pickle.dump(results, out)
     out.close()
 
-    out = open('{1}_{0}.sampler{2:02d}_model'.format(tt), rp['outfile'], 1), 'wb')
+    out = open('{1}_{0}.sampler{2:02d}_model'.format(tt, rp['outfile'], 1), 'wb')
     pickle.dump(model_store, out)
     out.close()
     

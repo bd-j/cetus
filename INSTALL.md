@@ -15,9 +15,9 @@ find them.
 
 	     ```
 		 export SPS_HOME="/home/name/pfs/code/fsps/"
-		 export PYTHONPATH=$PYTHONPATH:/home/name/pfs/code/site-packages/python-fsps/
-		 export PYTHONPATH=$PYTHONPATH:/home/name/pfs/code/site-packages/sedpy/
-		 export PYTHONPATH=$PYTHONPATH:/home/name/pfs/code/site-packages/bsfh/
+		 export PYTHONPATH=$PYTHONPATH:"/home/name/pfs/code/site-packages/python-fsps/"
+		 export PYTHONPATH=$PYTHONPATH:"/home/name/pfs/code/site-packages/sedpy/"
+		 export PYTHONPATH=$PYTHONPATH:"/home/name/pfs/code/site-packages/bsfh/"
 		 ```
 
 1. Install FSPS. 
@@ -32,10 +32,12 @@ find them.
 
 3. Install python-FSPS.
 
-    This will use f2py, which presumably exists (installed with numpy)
-    and uses an ifort compiler.  Anyway, it is important that both
-    FSPS and python-FSPS use the same fortran compiler.  I have had
-    success using the default compiler options, `-cpp -fPIC`.
+    This will use f2py, which presumably exists (it's usually
+    installed with numpy, but some kinds of numpy installs can result
+    in broken f2py) and uses an ifort compiler.  Anyway, it is
+    important that both FSPS and python-FSPS use the same fortran
+    compiler.  I have had success using the default compiler options,
+    `-cpp -fPIC`.
 
 	1. `cd ~/pfs/code/site-packages`
     2. `git clone https://github.com/bd-j/python-fsps`
@@ -44,10 +46,10 @@ find them.
        the last line contains *removing build directory* then you are
        golden.
     5. If you are using MPI, there is a change that needs to be made
-	    in `fsps.__init__.py`. Namely, you must comment out the FSPS
-	    revision check, which spawns a subprocess, which isn't allowed
-		for slave processes in MPI.  Not sure why this is only an
-	    issue on Hyades and not on a laptop...
+	    in `python-fsps/fsps/__init__.py`. Namely, you must comment
+	    out the FSPS revision check, which spawns a subprocess, which
+	    isn't allowed for slave processes in MPI.  Not sure why this
+	    is only an issue on Hyades and not on a laptop...
 
 4. Install sedpy 
     (for dust and filter projections)
@@ -55,7 +57,6 @@ find them.
 	0. `cd ~/pfs/code/site-packages`
     1. `git clone https://github.com/bd-j/sedpy`
     2. `cd sedpy/`
-    3. `python setup.py install` this will fail.  need to add this package (and others) to the python path
 
 5. Install bsfh
 
