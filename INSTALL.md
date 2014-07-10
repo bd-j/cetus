@@ -45,7 +45,9 @@ find them.
        golden.
     5. If you are using MPI, there is a change that needs to be made
 	    in `fsps.__init__.py`. Namely, you must comment out the FSPS
-	    revision check, which spawns a subprocess
+	    revision check, which spawns a subprocess, which isn't allowed
+		for slave processes in MPI.  Not sure why this is only an
+	    issue on Hyades and not on a laptop...
 
 4. Install sedpy 
     (for dust and filter projections)

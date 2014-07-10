@@ -73,10 +73,12 @@ if __name__ == "__main__":
 
     inpar = utils.parse_args(sys.argv)
     rp, parlist = modeldef.read_plist(inpar['param_file'])
+    rp['param_file'] = inpar['param_file']
     #parlist, rp = modeldef.default_parlist, modeldef.rp
     #print(type(rp), len(rp))
     #rp = utils.parse_args(sys.argv, rp = rp)
     #sys.exit()
+    
     ############
     # LOAD DATA
     ##############
@@ -105,10 +107,9 @@ if __name__ == "__main__":
     #sys.exit()
     if rp['verbose']:
         print('Minimizing')
-        ts = time.time()
+    ts = time.time()
 
-    powell_opt = {'ftol': rp['ftol'],
-                'xtol':1e-6,
+    powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6,
                 'maxfev':rp['maxfev']}
         
     nthreads = rp['nthreads']
@@ -118,8 +119,10 @@ if __name__ == "__main__":
     
     best = np.argmin([p.fun for p in powell_guesses])
     best_guess = powell_guesses[best]
+    pdur = time.time() - ts
+    
     if rp['verbose']:
-        print('done Powell in {0}s'.format(time.time()-ts))
+        print('done Powell in {0}s'.format(pdur))
 
     ###################
     #SAMPLE
@@ -143,25 +146,32 @@ if __name__ == "__main__":
     results['obs'] = model.obs
     #results['theta'] = model.theta_desc
     results['initial_center'] = initial_center
+    results['initial_theta'] = theta_init
+    
     results['chain'] = esampler.chain
     results['lnprobability'] = esampler.lnprobability
     results['acceptance'] = esampler.acceptance_fraction
     results['duration'] = edur
-    results['initial_theta'] = theta_init
+    results['optimizer_duration'] = pdur
 
     model_store['powell'] = powell_guesses
     model_store['model'] = model
-    #rmodel_store['gp'] = gp
     #pull out the git hash for bsfh here.
-    gh = utils.run_command('cd ~/Codes/SEDfitting/bsfh/\n git rev-parse HEAD')[1][0].replace('\n','')
-    results['bsfh_version'] = gh
-    model_store['bsfh_version'] = gh
+    bsfh_dir = os.path.dirname(sps_basis.__file__)
+    bgh = utils.run_command('cd ' + bsfh_dir +
+                           '\n git rev-parse HEAD')[1][0].replace('\n','')
+    cgh = utils.run_command('git rev-parse HEAD')[1][0].replace('\n','')
 
-    out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(int(time.time()), rp['outfile'], 1), 'wb')
+    results['bsfh_version'] = bgh
+    results['cetus_version'] = cgh
+    model_store['bsfh_version'] = bgh
+    
+    tt = int(time.time())
+    out = open('{1}_{0}.sampler{2:02d}_mcmc'.format(tt), rp['outfile'], 1), 'wb')
     pickle.dump(results, out)
     out.close()
 
-    out = open('{1}_{0}.sampler{2:02d}_model'.format(int(time.time()), rp['outfile'], 1), 'wb')
+    out = open('{1}_{0}.sampler{2:02d}_model'.format(tt), rp['outfile'], 1), 'wb')
     pickle.dump(model_store, out)
     out.close()
     
