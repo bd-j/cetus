@@ -37,7 +37,7 @@ def lnprobfn(theta, mod):
         # Photometry term
         jitter = mod.params.get('phot_jitter',0)
         maggies = 10**(-0.4 * mod.obs['mags'])
-        phot_var = maggies**2 * ((mod.obs['mags_unc']/1.086)**2 + jitter**2)
+        phot_var = maggies**2 * ((mod.obs['mags_unc']/1.086)**2) + jitter**2#)
         lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var ).sum()
         lnp_phot +=  np.log(2*np.pi*phot_var).sum()
 
