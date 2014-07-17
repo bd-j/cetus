@@ -28,12 +28,12 @@ for f in files:
     #print(plist[1]['prior_function'])
 
 
-    rp['verbose'] = True
+    rp['verbose'] = False
     rp['filename'] = f
     rp['objname'] = obj
     rp['outfile'] = 'results/' + name
-    rp['maxfev'] = 5000
-    rp['nburn'] = 3 * [100]
+    rp['maxfev'] = 10000
+    rp['nburn'] = 3 * [50]
     rp['niter'] = 500
     rp['walker_factor'] = 8
 
