@@ -30,7 +30,7 @@ def lnprobfn(theta, mod):
 
         # Spectroscopy term
         t2 = time.time()
-        #mod.gp.sigma = (mod.obs['unc']/mod.obs['spectrum'])[mod.obs['mask']]
+        mod.gp.sigma = (mod.obs['unc']/mu)[mod.obs['mask']]
         #use a residual that is multiplicative of the mu
         r = (mod.obs['spectrum']/mu - cal)[mod.obs['mask']]
         mod.gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
