@@ -1,7 +1,7 @@
 import os, glob, copy
 import modeldef
 
-stat ='nocal'
+stat ='cal'
 datadir = 'data/mmt/nocal/'
 
 default_plist, default_rp = modeldef.default_parlist, modeldef.rp
