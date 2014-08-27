@@ -7,6 +7,7 @@ import pickle
 import sps_basis
 import modeldef
 import fitterutils as utils
+import datautils as dutil
 
 #SPS Model as global
 smooth_velocity = False
@@ -23,26 +24,31 @@ def lnprobfn(theta, mod):
         
         # Generate model
         t1 = time.time()        
-        spec, phot, x = mod.mean_model(theta, sps = sps)
+        mu, phot, x = mod.mean_model(theta, sps = sps)
+        log_mu = np.log(mu)
+        #polynomial in the log
+        log_cal = (mod.calibration(theta))
+        
+        mask = mod.obs['mask']
         d1 = time.time() - t1
 
         # Spectroscopy term
         t2 = time.time()
-        r = (mod.obs['spectrum'] - spec)[mod.obs['mask']]
+        #use a residual in log space
+        delta = (mod.obs['spectrum'] -log_mu - log_cal)[mask]
         mod.gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
-                      mod.params['gp_length'], check_finite = False)
-        lnp_spec = mod.gp.lnlike(r)
+                      mod.params['gp_length'], check_finite=True, force=False)
+        lnp_spec = mod.gp.lnlike(delta)
         d2 = time.time() - t2
 
         # Photometry term
         jitter = mod.params.get('phot_jitter',0)
         maggies = 10**(-0.4 * mod.obs['mags'])
-        phot_var = maggies**2 * ((mod.obs['mags_unc']/1.086)**2) + jitter**2#)
+        phot_var = maggies**2 * ((mod.obs['mags_unc']**2 + jitter**2)/1.086**2)
         lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var ).sum()
-        lnp_phot +=  np.log(2*np.pi*phot_var).sum()
+        lnp_phot +=  -0.5*np.log(phot_var).sum()
 
         if mod.verbose:
-            #if d2 > 0.1:
             print(theta)
             print('model calc = {0}s, lnlike calc = {1}'.format(d1,d2))
             fstring = 'lnp = {0}, lnp_spec = {1}, lnp_phot = {2}'
@@ -99,8 +105,17 @@ if __name__ == "__main__":
         print('Setting up model')
 
     model, initial_center = modeldef.initialize_model(rp, parlist, obs)
+    model.theta_desc['spec_norm']['prior_args']['mini'] = 0.0
+    initial_center[model.theta_desc['spec_norm']['i0']] = 0.1
+    
     model.params['smooth_velocity'] = smooth_velocity
     rp['ndim'] = model.ndim
+
+    s, u, m = dutil.logify(model.obs['spectrum'], model.obs['unc'],
+                           model.obs['mask'])
+    model.obs['spectrum'] = s
+    model.obs['unc'] = u
+    model.obs['mask'] = m
     
     #################
     #INITIAL GUESS USING POWELL MINIMIZATION
