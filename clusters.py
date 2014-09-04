@@ -4,10 +4,9 @@ import time, sys, os
 import numpy as np
 import pickle
 
-import sps_basis
-import modeldef
-import fitterutils as utils
-import datautils as dutil
+from bsfh import sps_basis, modeldef
+import bsfh.fitterutils as utils
+import bsfh.datautils as dutils
 
 #SPS Model as global
 smooth_velocity = False
@@ -92,7 +91,7 @@ if __name__ == "__main__":
     if rp['verbose']:
         print('Loading data')
 
-    obs = utils.load_obs_mmt(**rp)
+    obs = dutils.load_obs_mmt(**rp)
     #ignore the IR magnitudes
     obs['mags'] = obs['mags'][0:4]
     obs['mags_unc'] = obs['mags_unc'][0:4]
@@ -111,7 +110,7 @@ if __name__ == "__main__":
     model.params['smooth_velocity'] = smooth_velocity
     rp['ndim'] = model.ndim
 
-    s, u, m = dutil.logify(model.obs['spectrum'], model.obs['unc'],
+    s, u, m = dutils.logify(model.obs['spectrum'], model.obs['unc'],
                            model.obs['mask'])
     model.obs['spectrum'] = s
     model.obs['unc'] = u
