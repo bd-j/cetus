@@ -9,20 +9,21 @@ going to install all the extra packages to this directory, and then add
 this directory to the PYTHONPATH environment variable, so that python
 can find them.
 
-We are going to try and compile everything using intel compilers,
+We are going to try and compile everything using Intel compilers,
 since that is the compiler used for numpy and scipy.
 
 0. Setup environment.
     1. `mkdir /oasis/projects/nsf/<allocation>/<user>/code/site-packages`
     2.  In your .bashrc (or .bash_profile ?), add the following
 	     ```
-		 export PROJECT_DIR=/oasis/projects/nfs/csc107/<username>/
+		 export PROJECT_DIR=/oasis/projects/nfs/csc107/<username>
 		 export SPS_HOME="$PROJECT_DIR/code/fsps/"
 		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/python-fsps/"
 		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/sedpy/"
-		 export PYTHONPATH=$PYTHONPATH:"/home/name/pfs/code/site-packages/bsfh/"
+		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/bsfh/"
+		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/PyFITS/lib/"
 		 ```
-	3. In your .bashrc file aslo add the following
+	3. In your .bashrc file also add the following
         ```
 		module purge
 	    module load intel mvapich2_ib
@@ -36,8 +37,8 @@ since that is the compiler used for numpy and scipy.
 	0. `cd $PROJECT_DIR/code/`
     1. `svn checkout http://fsps.googlecode.com/svn/trunk/ fsps`
     2. `cd fsps/src/`
+	4. Make any changes to sps_vars.f90.  In particular, change to MILES
     3. In the Makefile, change to an ifort compiler (uncomment ``F90 = ifort``) and use compiler options ``F90_FLAGS = -O3 -cpp -fPIC``
-    4. Make any changes to sps_vars.f90.  In particular, change to MILES
     5. `make all`  you will get some warnings.
     6. smoke test by running `./simple.exe`
 
@@ -62,6 +63,13 @@ since that is the compiler used for numpy and scipy.
     4. `python setup.py build_fsps` which barfs lots of text, but if
        the last line contains *removing build directory* then you are
        golden.
+
+4. Install pyfits
+    We aren't going to try and compile the c extensions for reading
+    compressed files. So just don't compress your files, ok?
+	
+	0. `cd $PROJECT_DIR/site-packages`
+    1. `git clone https://github.com/spacetelescope/PyFITS`
 
 4. Install sedpy 
     (for dust and filter projections)
