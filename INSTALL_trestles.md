@@ -9,29 +9,47 @@ going to install all the extra packages to this directory, and then add
 this directory to the PYTHONPATH environment variable, so that python
 can find them.
 
-We are going to compile FSPS and python-FSPS using gfortran since I
+~~We are going to compile FSPS and python-FSPS using gfortran since I
 cant get f2py (necessary for python-FSPS) to use Intel compilers.  It
 appears that Tretles system python was built with gcc, but numpy and
-scipy were built with Intel.
+scipy were built with Intel.~~
+
+We are going to install FSPS and f2py using the intel compilers, so
+that we are not mixing compilers very much (numpy and scipy were buit
+with intel and seem to require the intel compilers to be loaded, even
+thoug the python was built with gcc)
+
 
 0. Setup environment.
     1. `mkdir /oasis/projects/nsf/<allocation>/<user>/code/site-packages`
     2.  In your .bashrc (or .bash_profile ?), add the following
-	     ```
-		 export PROJECT_DIR=/oasis/projects/nfs/csc107/<username>
-		 export SPS_HOME="$PROJECT_DIR/code/fsps/"
-		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/python-fsps/"
-		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/sedpy/"
-		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/bsfh/"
-		 export PYTHONPATH=$PYTHONPATH:"$PROJECT_DIR/code/site-packages/PyFITS/lib/"
-		 ```
-	3. In your .bashrc file also add the following
+        ```
+		export PROJECT_DIR=/oasis/projects/nfs/csc107/<username>
+		
+		export SPS_HOME=$PROJECT_DIR/code/fsps/
+		
+		export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/code/site-packages/PyFITS/lib
+		
+		export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/code/site-packages/emcee
+	
+		export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/code/site-packages/python-fsps
+		
+		export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/code/site-packages/sedpy
+		
+		export PYTHONPATH=$PYTHONPATH:$PROJECT_DIR/code/site-packages/bsfh
+		```
+		
+    3. In your .bashrc file also add the following
         ```
 		module purge
-	    module load intel mvapich2_ib
+		
+		module load intel mvapich2_ib
+		
+		module load gnu
+		
 		module load python
+		
 		module load scipy
-		module load mpi4py
 		```
 		
 1. Install FSPS. 
@@ -42,11 +60,11 @@ scipy were built with Intel.
 	4. Make any changes to sps_vars.f90.  In particular, change to
        MILES.  You should also change the `pset%zmet=20` lines in
        simple.f90 to `pset%zmet=4`
-    4. type `module load gnu`
-    3. In the Makefile, change to a gnu compiler (uncomment `F90 =
-       gfortran` and comment all others) and use compiler options
+    4. ~~type `module load gnu`~~
+    3. In the Makefile, change to a ~~gnu~~ intel compiler (uncomment `F90 =
+       ifort` and comment all others) and use compiler options
        `F90_FLAGS = -O -cpp -fPIC` 
-    5. `make all`  you might get some warnings.
+    5. `make all`  you might get some warnings using ifort
     6. smoke test by running `./simple.exe`
 
 3. Install python-FSPS.
@@ -54,9 +72,15 @@ scipy were built with Intel.
     This will use f2py (which requires the numpy module to be
     loaded). It is important that both FSPS and python-FSPS use the
     same fortran compiler.  The default for f2py on Trestles seems to
-    be gnu95, ~~but one can change the default compiler to intel by
-    adding `-c -fcompiler=intel` to the f2py call in the setup.py
-    script for python-fsps~~. I have had success using the default
+    be gnu95, but one can change the default compiler to intel by
+    adding the line
+	```
+	cmd += " --fcompiler=intelem"
+	```
+	
+	to python-fsps/setup.py just before the f90flags are specified (at line 46)
+	
+	I have had success using the default
     compiler options in setup.py, `-cpp -fPIC`.
 
 	1. `cd $PROJECT_DIR/code/site-packages`
