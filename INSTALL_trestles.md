@@ -63,7 +63,7 @@ thoug the python was built with gcc)
     4. ~~type `module load gnu`~~
     3. In the Makefile, change to a ~~gnu~~ intel compiler (uncomment `F90 =
        ifort` and comment all others) and use compiler options
-       `F90_FLAGS = -O -cpp -fPIC` 
+       `F90_FLAGS = -O3 -cpp -fPIC` 
     5. `make all`  you might get some warnings using ifort
     6. smoke test by running `./simple.exe`
 
@@ -74,14 +74,13 @@ thoug the python was built with gcc)
     same fortran compiler.  The default for f2py on Trestles seems to
     be gnu95, but one can change the default compiler to intel by
     adding the line
-	```
-	cmd += " --fcompiler=intelem"
-	```
+	    ```
+	    cmd += " --fcompiler=intelem"
+	    ```
 	
-	to python-fsps/setup.py just before the f90flags are specified (at line 46)
-	
-	I have had success using the default
-    compiler options in setup.py, `-cpp -fPIC`.
+	to python-fsps/setup.py just before the f90flags are specified (at
+    line 46). I have had success using the default compiler options in
+    setup.py, `-cpp -fPIC`.
 
 	1. `cd $PROJECT_DIR/code/site-packages`
     2. `git clone https://github.com/bd-j/python-fsps`
@@ -92,10 +91,9 @@ thoug the python was built with gcc)
 	    isn't allowed for slave processes in MPI.  Not sure why this
 	    isn't an issue on a laptop using MPI.  Also, the accepted
 	    revisions list usually lags the FSPS current revision.
-	4. type `module load gnu`
-    4. `python setup.py build` which barfs lots of text, but if
-       the last few lines contains *removing build directory*,
-       *running build_scripts*,  then you are
+	4. ~~type `module load gnu`~~
+    4. `python setup.py build` which barfs lots of text, but if the
+       last few lines contains *removing build directory* then you are
        golden.
 
 4. Install pyfits
@@ -110,7 +108,6 @@ thoug the python was built with gcc)
 
 	0. `cd $PROJECT_DIR/site-packages`
     1. `git clone https://github.com/bd-j/sedpy`
-    2. `cd sedpy/`
 
 4. Install emcee
     0. `cd $PROJECT_DIR/site-packages`
@@ -127,7 +124,7 @@ thoug the python was built with gcc)
     and where results will be stored.
 	
     0. `cd $PROJECT_DIR/code/`
-    1. `git clone  https://github.com/bd-j/cetus`
+    1. `git clone  https://<gh username>:<gh password>@github.com/bd-j/cetus`
 
 7. command line syntax
 
@@ -137,5 +134,5 @@ thoug the python was built with gcc)
 	queue. I think this is because ATLAS was compiled with that many
 	processors available, and freaks out if it finds fewer
 	
-    1. `python bsfh.py --param_file  <param file>`
-    2. `mpirun -np <np> python bsfh.py --param_file <param_file>`
+    1. single thread: `python clusters.py --param_file  <param file>`
+    2. multiprocessing: `mpirun -np <np> python clusters.py --param_file <param_file>`

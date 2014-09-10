@@ -1,18 +1,22 @@
-#!/usr/local/bin/python
-#####!/opt/python/bin/python
+####!/usr/local/bin/python
+#!/opt/python/bin/python
 #mpirun -np 4 python test_mpi.py > logmp
 
 import sys, getopt, os, time
 import numpy as np
-import gp
+from bsfh import gp
+import sedpy
 import fsps
+
+try:
+    import astropy.io.fits as pyfits
+except(ImportError):
+    import pyfits
 
 sps = fsps.StellarPopulation(add_agb_dust_model = True)
 wave = sps.wavelengths
 sigma = np.random.uniform(size =len(wave))
 #gap = gp.GaussianProcess(wave, sigma)
-
-rp = { 'outfile':'test_mpi.dat'}
 
 def test(args):
     arg  = args[0]
@@ -43,14 +47,14 @@ except ImportError:
 
 if __name__ == "__main__":
 
- 
-
+    rp = { 'outfile':'test_mpi.dat'}
+    
     gap = gp.GaussianProcess(wave, sigma)
     a, s, l = 0.1, 0.0, 0.1
     gap.factor(s, a, l)
     #M = map
 
-    j = list(M(test, [[i, gap] for i in range(32)]))
+    j = list(M(test, [[i, gap] for i in range(60)]))
 
     fn = open(rp['outfile'],'wb')
     for i in j:
