@@ -54,7 +54,7 @@ if __name__ == "__main__":
     gap.factor(s, a, l)
     #M = map
 
-    j = list(M(test, [[i, gap] for i in range(60)]))
+    j = list(M(test, [[i, gap] for i in range(100)]))
 
     fn = open(rp['outfile'],'wb')
     for i in j:

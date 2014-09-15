@@ -13,9 +13,4 @@
 #PBS -N cetus_mpi_test 
 #PBS -V
 cd $PBS_O_WORKDIR #change to the working directory
-module load intel mvapich2_ib
-module load python
-module load scipy
-module load mpi4py
-
-mpirun_rsh -np 64 -hostfile $PBS_NODEFILE test_mpi.py
+mpirun_rsh -np 64 -hostfile $PBS_NODEFILE python test_mpi.py
