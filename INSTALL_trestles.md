@@ -17,7 +17,7 @@ scipy were built with Intel.~~
 We are going to install FSPS and f2py using the intel compilers, so
 that we are not mixing compilers very much (numpy and scipy were buit
 with intel and seem to require the intel compilers to be loaded, even
-thoug the python was built with gcc)
+though the python was built with gcc)
 
 
 0. Setup environment.
@@ -50,6 +50,8 @@ thoug the python was built with gcc)
 		module load python
 		
 		module load scipy
+		
+		module load mpi4py
 		```
 		
 1. Install FSPS. 
@@ -64,7 +66,7 @@ thoug the python was built with gcc)
     3. In the Makefile, change to a ~~gnu~~ intel compiler (uncomment `F90 =
        ifort` and comment all others) and use compiler options
        `F90_FLAGS = -O3 -cpp -fPIC` 
-    5. `make all`  you might get some warnings using ifort
+    5. `make all`  you might get some warnings using ifort, that's ok
     6. smoke test by running `./simple.exe`
 
 3. Install python-FSPS.
@@ -97,6 +99,7 @@ thoug the python was built with gcc)
        golden.
 
 4. Install pyfits
+
     We aren't going to try and compile the c extensions for reading
     compressed files. So just don't compress your files, ok?
 	
@@ -128,11 +131,7 @@ thoug the python was built with gcc)
 
 7. command line syntax
 
-	This is what should go in the .pb scripts
-	Note that the ATLAS library that scipy uses to do the matrix
-	inversions will throw assertion errors if if it is not run on the hyper
-	queue. I think this is because ATLAS was compiled with that many
-	processors available, and freaks out if it finds fewer
+	This is what should go in the .pb scripts.
 	
     1. single thread: `python clusters.py --param_file  <param file>`
-    2. multiprocessing: `mpirun -np <np> python clusters.py --param_file <param_file>`
+    2. multiprocessing: `mpirun_rsh -np <np> -hostfile $PBS_NODEFILE python clusters.py --param_file <param_file>`
