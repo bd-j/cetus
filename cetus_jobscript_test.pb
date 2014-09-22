@@ -13,4 +13,4 @@
 #PBS -N cetus_mpi_test 
 #PBS -V
 cd $PBS_O_WORKDIR #change to the working directory
-mpirun_rsh -np 64 -hostfile $PBS_NODEFILE python test_mpi.py
+mpirun_rsh -np 64 -hostfile $PBS_NODEFILE python clusters.py --param_file parfiles/b192-g242.225.cal.bpars_testing.json
