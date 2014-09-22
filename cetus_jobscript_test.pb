@@ -6,7 +6,7 @@
 # number of nodes and number of processors per node requested
 #PBS -l nodes=2:ppn=32
 # requested Wall-clock time.
-#PBS -l walltime=00:10:00
+#PBS -l walltime=05:00:00
 # name of the standard out file to be "output-file".
 #PBS -o test_job_output
 # name of the job
