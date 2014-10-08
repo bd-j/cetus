@@ -128,12 +128,12 @@ if __name__ == "__main__":
                 'maxfev':rp['maxfev']}
         
     nthreads = rp['nthreads']
-    powell_guesses, pinit = utils.pminimize(chi2, model, initial_center,
-                                       method ='powell', opts =powell_opt,
-                                       pool = pool, nthreads = rp['nthreads'])
+    #powell_guesses, pinit = utils.pminimize(chi2, model, initial_center,
+    #                                   method ='powell', opts =powell_opt,
+    #                                   pool = pool, nthreads = rp['nthreads'])
     
-    best = np.argmin([p.fun for p in powell_guesses])
-    best_guess = powell_guesses[best]
+    #best = np.argmin([p.fun for p in powell_guesses])
+    #best_guess = powell_guesses[best]
     pdur = time.time() - ts
     
     if rp['verbose']:
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     
     #nsamplers = int(rp['nsamplers'])
     theta_init = initial_center
-    initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
+    #initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
     esampler = utils.run_emcee_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     results['duration'] = edur
     results['optimizer_duration'] = pdur
 
-    model_store['powell'] = powell_guesses
+    #model_store['powell'] = powell_guesses
     model_store['model'] = model
     #pull out the git hash for bsfh here.
     bsfh_dir = os.path.dirname(sps_basis.__file__)
