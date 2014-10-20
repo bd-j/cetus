@@ -57,7 +57,7 @@ def lnprobfn(theta, mod):
     else:
         return -np.infty
     
-def chi2(theta, mod):
+def chisqfn(theta, mod):
     return -lnprobfn(theta, mod)
 
 #MPI pool.  This must be done *after* lnprob and
@@ -72,7 +72,6 @@ try:
         sys.exit(0)
 except(ValueError):
     pool = None
-
     
 if __name__ == "__main__":
 
@@ -98,7 +97,7 @@ if __name__ == "__main__":
     obs['filters'] = obs['filters'][0:4]
 
     ###############
-    #MODEL SET UP
+    # MODEL SET UP
     ##############
     if rp['verbose']:
         print('Setting up model')
@@ -127,9 +126,10 @@ if __name__ == "__main__":
 
     powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6,
                 'maxfev':rp['maxfev']}
-        
+
+    
     nthreads = rp['nthreads']
-    powell_guesses, pinit = utils.pminimize(chi2, model, initial_center,
+    powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_center,
                                        method ='powell', opts =powell_opt,
                                        pool = pool, nthreads = rp['nthreads'])
     
@@ -146,6 +146,7 @@ if __name__ == "__main__":
     #sys.exit()
     if rp['verbose']:
         print('emcee...')
+    model.gp.factorized_Sigma=None
     tstart = time.time()
     
     #nsamplers = int(rp['nsamplers'])
