@@ -109,6 +109,8 @@ if __name__ == "__main__":
     
     model.params['smooth_velocity'] = smooth_velocity
     rp['ndim'] = model.ndim
+    if rp['verbose']:
+        print('N dimensions = {}'.format(ndim))
 
     s, u, m = dutils.logify(model.obs['spectrum'], model.obs['unc'],
                            model.obs['mask'])
@@ -150,7 +152,7 @@ if __name__ == "__main__":
     #nsamplers = int(rp['nsamplers'])
     theta_init = initial_center
     #initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
-    esampler = utils.run_emcee_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
+    esampler = utils.run_emcee_sampler(model, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
 
     ###################

@@ -44,9 +44,7 @@ though the python was built with gcc)
 		module purge
 		
 		module load intel mvapich2_ib
-		
-		module load gnu
-		
+				
 		module load python
 		
 		module load scipy

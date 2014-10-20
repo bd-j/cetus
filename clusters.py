@@ -21,7 +21,7 @@ def lnprobfn(theta, mod):
     lnp_prior = mod.prior_product(theta)
     if np.isfinite(lnp_prior):
         
-        # Generate model
+        # Generate mean model
         t1 = time.time()        
         mu, phot, x = mod.mean_model(theta, sps = sps)
         log_mu = np.log(mu)
@@ -34,7 +34,7 @@ def lnprobfn(theta, mod):
         # Spectroscopy term
         t2 = time.time()
         #use a residual in log space
-        delta = (mod.obs['spectrum'] -log_mu - log_cal)[mask]
+        delta = (mod.obs['spectrum'] - log_mu - log_cal)[mask]
         mod.gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
                       mod.params['gp_length'], check_finite=False, force=False)
         lnp_spec = mod.gp.lnlike(delta)
@@ -110,6 +110,7 @@ if __name__ == "__main__":
     model.params['smooth_velocity'] = smooth_velocity
     rp['ndim'] = model.ndim
 
+    #logify the data
     s, u, m = dutils.logify(model.obs['spectrum'], model.obs['unc'],
                            model.obs['mask'])
     model.obs['spectrum'] = s
@@ -150,7 +151,7 @@ if __name__ == "__main__":
     #nsamplers = int(rp['nsamplers'])
     theta_init = initial_center
     initial_center = best_guess.x #np.array([8e3, 2e-2, 0.5, 0.1, 0.1, norm])
-    esampler = utils.run_emcee_sampler(model, sps, lnprobfn, initial_center, rp, pool = pool)
+    esampler = utils.run_emcee_sampler(model, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
 
     ###################
