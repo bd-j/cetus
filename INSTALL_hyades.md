@@ -69,7 +69,7 @@ find them.
     and where results will be stored.
 	
     0. `cd ~/pfs/code/`
-    1. `git clone  https://github.com/bd-j/cetus`
+    1. `git clone  https://<ghuser>@github.com/bd-j/cetus`
 
 7. command line syntax
 
