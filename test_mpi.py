@@ -62,6 +62,7 @@ if __name__ == '__main__':
     fn = open(rp['outfile'],'wb')
     for i in j:
         fn.write('{0} {1} {2} {3}\n'.format(*i))
+    fn.write('total_time={}'.format(time.time() - total_start))
     fn.close()
     try:
         pool.close()
