@@ -29,7 +29,7 @@ def getmass(tage):
     #                              np.fix(np.random.uniform(0,4)).astype(int)+1)
     #return sps.stellar_mass
     params = {'tage':tage, 'mass':1.0, 'dust_curve': cardelli,
-              'zmet':np.fix(np.random.uniform(0,4)).astype(int)+1}
+              'zmet': np.fix(np.random.uniform(0,4)).astype(int)+1}
     spec, phot, mass = sps.get_spectrum(params, None, None)    
     return mass
 
@@ -48,10 +48,10 @@ except (ImportError, ValueError):
     M = map
     print('Not using MPI')
    
-if __name__ == '__main__': 
-    rp = { 'outfile':'test_mpi.dat'}
+if __name__ == '__main__':
 
     total_start = time.time()
+    rp = { 'outfile':'test_mpi_{}.dat'.format(total_start)}
     gap = gp.GaussianProcess(wave, sigma)
     a, s, l = 0.1, 0.0, 0.1
     gap.factor(s, a, l)
