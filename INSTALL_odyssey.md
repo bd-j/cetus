@@ -28,7 +28,7 @@ up-to-date intel libraries and using the intel compilers
 	   source /usr/local/bin/new-modules.sh
 	   module load intel
 	   module load openmpi
-	   module load intel-mkl
+	   #module load intel-mkl
 	   module load python
 	   export APPS=/n/regal/conroy_lab/<user_name>
 	   export SPS_HOME=$APPS/fsps/
