@@ -11,4 +11,5 @@
 ### output and error logs
 #SBATCH -o mpitest.out
 #SBATCH -e mpitest.err
+### source activate pympi
 mpirun -n 32 python test_mpi.py

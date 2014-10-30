@@ -43,7 +43,7 @@ try:
         # Wait for instructions from the master process.
         pool.wait()
         sys.exit(0)
-except ImportError:
+except (ImportError, ValueError):
     pool = None
     M = map
     print('Not using MPI')
