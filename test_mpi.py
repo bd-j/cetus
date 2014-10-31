@@ -19,17 +19,20 @@ def test(args):
     #start =time.time()
     arg  = args[0]
     gaproc = args[1]
-    a, s, l = 0.1, 0.0, 0.1*np.random.uniform(0,1)#arg**(0.5) + 10
-    gaproc.factor(s,a,l)
+    a, s, l = 0.1, 0.0, 100.0*np.random.uniform(0,1)#arg**(0.5) + 10
+    tinv = time.time()
+    gaproc.factor(s,a,l, check_finite=False)
+    gaproc.factorized_Sigma = None
+    tinv = time.time() - tinv 
     mass = getmass(arg**(0.5)/5.+0.1)
-    return (os.getpid(), arg*arg, time.time()-start, mass)
+    return (os.getpid(), arg*arg, time.time()-start, tinv, mass)
 
 def getmass(tage):
     #wave, spec = sps.get_spectrum(tage=tage, zmet =
     #                              np.fix(np.random.uniform(0,4)).astype(int)+1)
     #return sps.stellar_mass
     params = {'tage':tage, 'mass':1.0, 'dust_curve': cardelli,
-              'zmet': np.fix(np.random.uniform(0,4)).astype(int)+1}
+              'zmet': np.random.uniform(-1.5,0.2)}
     spec, phot, mass = sps.get_spectrum(params, None, None)    
     return mass
 
@@ -51,17 +54,19 @@ except (ImportError, ValueError):
 if __name__ == '__main__':
 
     total_start = time.time()
-    rp = { 'outfile':'test_mpi_{}.dat'.format(total_start)}
+    rp = { 'outfile':'test_mpi_{:.0f}.dat'.format(total_start)}
     gap = gp.GaussianProcess(wave, sigma)
     a, s, l = 0.1, 0.0, 0.1
     gap.factor(s, a, l)
     gap.factorized_Sigma=None
-
+    ts = time.time() - total_start
+    
     j = list(M(test, [[i, gap] for i in range(64)]))
 
     fn = open(rp['outfile'],'wb')
+    fn.write('initial time = {}'.format(ts))
     for i in j:
-        fn.write('{0} {1} {2} {3}\n'.format(*i))
+        fn.write('{0} {1} {2} {3} {4}\n'.format(*i))
     fn.write('total_time={}'.format(time.time() - total_start))
     fn.close()
     try:

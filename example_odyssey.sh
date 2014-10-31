@@ -8,8 +8,10 @@
 #SBATCH -p conroy
 ### memory per cpu, in MB
 #SBATCH --mem-per-cpu=1000
+### Job name
+#SBATCH -J 'mpi_test'
 ### output and error logs
-#SBATCH -o mpitest.out
-#SBATCH -e mpitest.err
+#SBATCH -o mpitest_%j.out
+#SBATCH -e mpitest_%j.err
 ### source activate pympi
 mpirun -n 32 python test_mpi.py
