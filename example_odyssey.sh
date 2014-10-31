@@ -7,7 +7,7 @@
 ### Partition or queue name
 #SBATCH -p conroy
 ### memory per cpu, in MB
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=2000
 ### Job name
 #SBATCH -J 'mpi_test'
 ### output and error logs

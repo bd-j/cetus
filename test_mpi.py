@@ -64,7 +64,7 @@ if __name__ == '__main__':
     j = list(M(test, [[i, gap] for i in range(64)]))
 
     fn = open(rp['outfile'],'wb')
-    fn.write('initial time = {}'.format(ts))
+    fn.write('initial time = {}\n'.format(ts))
     for i in j:
         fn.write('{0} {1} {2} {3} {4}\n'.format(*i))
     fn.write('total_time={}'.format(time.time() - total_start))
