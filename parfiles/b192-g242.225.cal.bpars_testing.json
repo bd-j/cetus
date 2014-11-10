@@ -18,7 +18,8 @@
 {"units": "$\\AA$", "init": 7300.0, "isfree": false, "name": "max_wave_smooth", "N": 1}, 
 {"prior_function_name": "tophat", "name": "poly_coeffs", "init": [-0.01, -0.01], "N": 2, "prior_args": {"mini": [-50, -500], "maxi": [50, 500]}, "isfree": true, "units": null}, 
 {"prior_function_name": "tophat", "name": "spec_norm", "init": 1.1, "N": 1, "prior_args": {"mini": -10, "maxi": 10}, "isfree": true, "units": null}, 
-{"prior_function_name": "tophat", "name": "gp_jitter", "init": 0.00, "N": 1, "prior_args": {"mini": 0.0, "maxi": 0.1}, "isfree": false, "units": "$d/\\mu$"}, 
+
+ {"prior_function_name": "tophat", "name": "gp_jitter", "init": 0.00, "N": 1, "prior_args": {"mini": 0.0, "maxi": 0.1}, "isfree": false, "units": "$d/\\mu$"}, 
 {"prior_function_name": "tophat", "name": "gp_amplitude", "init": 0.01, "N": 1, "prior_args": {"mini": 0.0, "maxi": 0.5}, "isfree": true, "units": "$d/\\mu$"}, 
 {"prior_function_name": "lognormal", "name": "gp_length", "init": 60.0, "N": 1, "prior_args": {"log_mean":4.0, "sigma":0.1}, "isfree": true, "units": "$\\AA$"}, 
 
