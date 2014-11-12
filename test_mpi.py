@@ -33,7 +33,7 @@ def getmass(tage):
     #return sps.stellar_mass
     params = {'tage':tage, 'mass':1.0, 'dust_curve': cardelli,
               'zmet': np.random.uniform(-1.5,0.2)}
-    spec, phot, mass = sps.get_spectrum(params, None, None)    
+    spec, phot, mass = sps.get_spectrum(outwave = None, filters = None, **params)    
     return mass
 
 start = time.time()
