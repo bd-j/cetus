@@ -13,7 +13,7 @@ import bsfh.datautils as dutils
 smooth_velocity = False
 sps = sps_basis.StellarPopBasis(smooth_velocity = smooth_velocity)
 
-#Gp as global
+#Gp instance as global
 gp = GaussianProcess(None, None)
 
 #LnP function as global
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6,
                 'maxfev':rp['maxfev']}
     powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_center,
-                                       method ='powell', opts =powell_opt,
+                                       method ='powell', opts=powell_opt,
                                        pool = pool, nthreads = rp['nthreads'])
     
     best = np.argmin([p.fun for p in powell_guesses])
