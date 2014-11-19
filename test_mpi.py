@@ -13,16 +13,16 @@ sps = sps_basis.StellarPopBasis(smooth_velocity=False)
 wave = sps.ssp.wavelengths
 sigma = np.random.uniform(size=len(wave))
 
-#gap = gp.GaussianProcess(wave, sigma)
+gap = gp.GaussianProcess(wave[:1000], sigma[:1000])
 
 def test(args):
     #start =time.time()
     arg  = args[0]
-    gaproc = args[1]
+    #gaproc = args[1]
     a, s, l = 0.1, 0.0, 100.0*np.random.uniform(0,1)#arg**(0.5) + 10
     tinv = time.time()
-    gaproc.factor(s,a,l, check_finite=False)
-    gaproc.factorized_Sigma = None
+    gap.factor(s,a,l, check_finite=False)
+    gap.factorized_Sigma = None
     tinv = time.time() - tinv 
     mass = getmass(arg**(0.5)/5.+0.1)
     return (os.getpid(), arg*arg, time.time()-start, tinv, mass)
@@ -40,7 +40,7 @@ start = time.time()
 
 try:
     from emcee.utils import MPIPool
-    pool = MPIPool(debug = True)
+    pool = MPIPool(debug = True, loadbalance=True)
     M = pool.map
     if not pool.is_master():
         # Wait for instructions from the master process.
@@ -55,13 +55,13 @@ if __name__ == '__main__':
 
     total_start = time.time()
     rp = { 'outfile':'test_mpi_{:.0f}.dat'.format(total_start)}
-    gap = gp.GaussianProcess(wave, sigma)
+    #gap = gp.GaussianProcess(wave, sigma)
     a, s, l = 0.1, 0.0, 0.1
-    gap.factor(s, a, l)
-    gap.factorized_Sigma=None
+    #gap.factor(s, a, l)
+    #gap.factorized_Sigma=None
     ts = time.time() - total_start
     
-    j = list(M(test, [[i, gap] for i in range(64)]))
+    j = list(M(test, [[i] for i in range(64)]))
 
     fn = open(rp['outfile'],'wb')
     fn.write('initial time = {}\n'.format(ts))
