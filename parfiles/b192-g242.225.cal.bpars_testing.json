@@ -1,4 +1,4 @@
-[{"nthreads": 1, "nsamplers": 1, "whi": 7200.0, "initial_disp": 0.1, "outfile": "results/b192-g242.225.cal", "nburn": [32, 32], "objname": "B192-G242", "maxfev": 100, "verbose": true, "niter": 32, "filename": "data/mmt/nocal/225.B192-G242.s.fits", "wlo": 3750.0, "ftol": 5e-06, "walker_factor": 4}, 
+[{ "whi": 7200.0, "initial_disp": 0.1, "outfile": "results/b192-g242.225.cal", "nburn": [32, 32], "objname": "B192-G242", "maxfev": 100, "verbose": true, "niter": 32, "filename": "data/mmt/nocal/225.B192-G242.s.fits", "wlo": 3750.0, "ftol": 5e-06, "walker_factor": 4}, 
 [{"name": "lumdist", "init": 0.783, "N": 1, "prior_args": null, "isfree": false, "units": "Mpc"}, 
 {"prior_function_name": "tophat", "name": "mass", "init": 10000.0, "N": 1, "prior_args": {"mini": 100.0, "maxi": 200000.0}, "isfree": true, "units": "M$_\\odot$"}, 
 {"prior_function_name": "tophat", "name": "tage", "init": 0.25, "N": 1, "prior_args": {"mini": 0.025, "maxi": 1.0}, "isfree": true, "units": "Gyr"}, 
