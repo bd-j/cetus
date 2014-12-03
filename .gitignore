@@ -6,3 +6,4 @@ trestles_logs/
 dali_logs/
 odyssey_logs/
 hyades_logs/
+*pyc

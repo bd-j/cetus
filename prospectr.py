@@ -9,6 +9,7 @@ from bsfh.gp import GaussianProcess
 import bsfh.fitterutils as utils
 from bsfh import model_setup
 
+# Read command line arguments
 argdict={'param_file':None, 'sps':'sps_basis',
          'custom_filter_keys':None,
          'compute_vega_mags':False,
@@ -72,7 +73,7 @@ def lnprobfn(theta, mod):
             delta = (mod.obs['spectrum'] - log_mu - log_cal)[mask]
             gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
                       mod.params['gp_length'], check_finite=False, force=False)
-            lnp_spec = gp.lnlike(delta)
+            lnp_spec = gp.lnlike(delta, check_finite=False)
         else:
             lnp_spec = 0.0
 
@@ -122,12 +123,13 @@ if __name__ == "__main__":
     ################
 
     inpar = model_setup.parse_args(sys.argv)
-    parset, model = model_setup.setup_model(inpar['param_file'], sps=sps)
-    parset.run_params['ndim'] = model.ndim
-    _ = model_setup.parse_args(sys.argv, argdict=parset.run_params)
-    parset.run_params['sys.argv'] = sys.argv
-    rp = parset.run_params #shortname
-    initial_theta = parset.initial_theta
+    model = model_setup.setup_model(inpar['param_file'], sps=sps)
+    model.run_params['ndim'] = model.ndim
+    # Command line override of run_params
+    _ = model_setup.parse_args(sys.argv, argdict=model.run_params)
+    model.run_params['sys.argv'] = sys.argv
+    rp = model.run_params #shortname
+    initial_theta = model.initial_theta
     if rp.get('debug', False):
         sys.exit()
         
@@ -165,7 +167,7 @@ if __name__ == "__main__":
     ###################
     # PICKLE OUTPUT
     ###################
-    write_results.write_pickles(parset, model, esampler, powell_guesses,
+    write_results.write_pickles(model, esampler, powell_guesses,
                                 toptimize=pdur, tsample=edur,
                                 sampling_initial_center=initial_center)
     

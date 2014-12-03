@@ -11,17 +11,18 @@ tophat = priors.tophat
  
 run_params = {'verbose':True,
               'outfile':'results/test',
-              'ftol':0.5e-5, 'maxfev':100,
+              'ftol':0.5e-5, 'maxfev':1000,
               'nwalkers':64, #'walker_factor':4
               'nburn':[32, 64, 128], 'niter':128,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock': True,
-              'debug':True,
+              'debug':False,
               'data_loading_function_name': "load_obs_mmt",
               'spec': True, 'phot':True,
-              'logify_spectrum':False,
+              'logify_spectrum':True,
               'normalize_spectrum':True,
+              'norm_band_name':'f475w',
               'rescale':True,
               'filename':'/Users/bjohnson/projects/cetus/data/mmt/nocal/020.B192-G242.s.fits',
               "phottable":"/Users/bjohnson/Projects/cetus/data/f2_apcanfinal_6phot_v2.fits",
@@ -163,7 +164,7 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 
 polyorder = 2
 polymin = [-100, -1000]
-polymax = [100, -1000]
+polymax = [100, 1000]
 polyinit = [0.1, 0.1]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
@@ -256,7 +257,7 @@ mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.1,
                        'emission_luminosity': nlines * [0.0]}
 psnr = obs['maggies']/obs['maggies_unc']
 psnr[~np.isfinite(psnr)] = 3
-mock_info['phot_snr'] = psnr
+mock_info['phot_snr'] = 20.0
 mock_info['spec_snr'] = (obs['spectrum']/obs['unc'])[obs['mask']]
 
 rp_uncal = deepcopy(run_params)
@@ -264,4 +265,4 @@ rp_uncal['filename'] = rp_uncal['filename'].replace('.s.fits','.v.fits')
 obs_uncal = load_obs_mmt(**rp_uncal)
 
 mock_info['calibration'] = (obs_uncal['spectrum']/obs['spectrum'])[obs['mask']]
-run_params['mock_info'] = mock_info
+#run_params['mock_info'] = mock_info

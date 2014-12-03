@@ -1,7 +1,6 @@
 Installation (on Stampede)
 =====
 
-Stampede has no f2py so we are screwed.
 
 You need to install several packages.  Also, you will need numpy,
 scipy, mpi4py, and f2py.  You should make a
