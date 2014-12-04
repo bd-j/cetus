@@ -11,15 +11,14 @@ tophat = priors.tophat
  
 run_params = {'verbose':True,
               'outfile':'results/test',
-              'ftol':0.5e-5, 'maxfev':1000,
+              'ftol':0.5e-5, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[32, 64, 128], 'niter':128,
+              'nburn':[64, 128, 256], 'niter':256,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
-              'mock': True,
+              'mock':True,
               'debug':False,
               'data_loading_function_name': "load_obs_mmt",
-              'spec': True, 'phot':True,
               'logify_spectrum':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
@@ -163,8 +162,8 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 ###### CALIBRATION ###########
 
 polyorder = 2
-polymin = [-100, -1000]
-polymax = [100, 1000]
+polymin = [-1000, -3000]
+polymax = [1000, 3000]
 polyinit = [0.1, 0.1]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
@@ -219,6 +218,11 @@ linelist = ['CaII_K', 'NaI_5891', 'NaI_5897',
 linemin = 3 * [-100] + 4 * [0.]  + 8 * [-50.0 ]
 linemax = 3 * [0.] + 4 * [100.0 ] + 8 * [50.0 ]
 lineinit = 3 * [-0.1 ] + 4 * [1.0 ] + 8 * [0.1 ]
+
+linelist = linelist[0:7]
+linemin = linemin[0:7]
+linemax = linemax[0:7]
+lineinit = lineinit[0:7]
 
 nlines = len(linelist)
 ewave = [elines.wavelength[l] for l in linelist]

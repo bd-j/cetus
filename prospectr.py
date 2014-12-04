@@ -9,14 +9,18 @@ from bsfh.gp import GaussianProcess
 import bsfh.fitterutils as utils
 from bsfh import model_setup
 
+#########
 # Read command line arguments
+#########
 argdict={'param_file':None, 'sps':'sps_basis',
          'custom_filter_keys':None,
          'compute_vega_mags':False,
          'zcontinuous':True}
 argdict = model_setup.parse_args(sys.argv, argdict=argdict)
 
+#########
 #SPS Model instance as global
+########
 if argdict['sps'] == 'sps_basis':
     from bsfh import sps_basis
     sps = sps_basis.StellarPopBasis(compute_vega_mags=argdict['compute_vega_mags'])
@@ -30,11 +34,12 @@ elif argdict['sps'] == 'fsps':
 else:
     print('No SPS type set')
     sys.exit()
-              
 #GP instance as global
 gp = GaussianProcess(None, None)
 
+########
 #LnP function as global
+########
 def lnprobfn(theta, mod):
     """
     Given a model object and a parameter vector, return the ln of the
@@ -130,14 +135,20 @@ if __name__ == "__main__":
     model.run_params['sys.argv'] = sys.argv
     rp = model.run_params #shortname
     initial_theta = model.initial_theta
+    if rp['verbose']:
+        print(model.params)
     if rp.get('debug', False):
+        try:
+            pool.close()
+        except:
+            pass
         sys.exit()
         
     #################
     #INITIAL GUESS(ES) USING POWELL MINIMIZATION
     #################
     if rp['verbose']:
-        print('Minimizing')
+        print('minimizing chi-square...')
     ts = time.time()
     powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6, 'maxfev':rp['maxfev']}
     powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
@@ -156,7 +167,7 @@ if __name__ == "__main__":
     ####################
     #sys.exit()
     if rp['verbose']:
-        print('emcee...')
+        print('emcee sampling...')
     tstart = time.time()
     initial_center = best_guess.x
     esampler = utils.run_emcee_sampler(model, lnprobfn, initial_center, rp, pool = pool)
