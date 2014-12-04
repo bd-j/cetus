@@ -14,4 +14,4 @@
 #SBATCH -o mpitest_%j.out
 #SBATCH -e mpitest_%j.err
 ### source activate pympi
-mpirun -n 32 python test_mpi.py
+mpirun -n 32 python test_mpi.py 62

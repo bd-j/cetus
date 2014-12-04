@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys, getopt, os, time
+total_start = time.time()
 import numpy as np
 from bsfh import gp, sps_basis
 import fsps
@@ -13,7 +14,7 @@ sps = sps_basis.StellarPopBasis(smooth_velocity=False)
 wave = sps.ssp.wavelengths
 sigma = np.random.uniform(size=len(wave))
 
-gap = gp.GaussianProcess(wave[:1000], sigma[:1000])
+gap = gp.GaussianProcess(wave, sigma)
 
 def test(args):
     #start =time.time()
@@ -32,7 +33,7 @@ def getmass(tage):
     #                              np.fix(np.random.uniform(0,4)).astype(int)+1)
     #return sps.stellar_mass
     params = {'tage':tage, 'mass':1.0, 'dust_curve': cardelli,
-              'zmet': np.random.uniform(-1.5,0.2)}
+              'zmet': 0.0}#np.random.uniform(-1.5,0.2)}
     spec, phot, mass = sps.get_spectrum(outwave = None, filters = None, **params)    
     return mass
 
@@ -52,8 +53,10 @@ except (ImportError, ValueError):
     print('Not using MPI')
    
 if __name__ == '__main__':
-
-    total_start = time.time()
+    try:
+        niter = int(sys.argv[1])
+    except(IndexError):
+        niter = 64
     rp = { 'outfile':'test_mpi_{:.0f}.dat'.format(total_start)}
     #gap = gp.GaussianProcess(wave, sigma)
     a, s, l = 0.1, 0.0, 0.1
@@ -61,13 +64,15 @@ if __name__ == '__main__':
     #gap.factorized_Sigma=None
     ts = time.time() - total_start
     
-    j = list(M(test, [[i] for i in range(64)]))
+    j = list(M(test, [[i] for i in range(niter)]))
 
     fn = open(rp['outfile'],'wb')
-    fn.write('initial time = {}\n'.format(ts))
+    fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(gap.wave), niter, pool.size))
+    fn.write('# initial time = {}\n'.format(ts))
+    fn.write('# pid, tid^2, tproc, tinv, mstar\n')
     for i in j:
         fn.write('{0} {1} {2} {3} {4}\n'.format(*i))
-    fn.write('total_time={}'.format(time.time() - total_start))
+    fn.write('# total_time={}'.format(time.time() - total_start))
     fn.close()
     try:
         pool.close()
