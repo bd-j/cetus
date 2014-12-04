@@ -14,7 +14,11 @@ sps = sps_basis.StellarPopBasis(smooth_velocity=False)
 wave = sps.ssp.wavelengths
 sigma = np.random.uniform(size=len(wave))
 
-gap = gp.GaussianProcess(wave, sigma)
+try:
+    nw = int(sys.argv[2])
+except(IndexError):
+    nw = -1
+gap = gp.GaussianProcess(wave[0:nw], sigma[0:nw])
 
 def test(args):
     #start =time.time()
@@ -26,7 +30,8 @@ def test(args):
     gap.factorized_Sigma = None
     tinv = time.time() - tinv 
     mass = getmass(arg**(0.5)/5.+0.1)
-    return (os.getpid(), arg*arg, time.time()-start, tinv, mass)
+    return (os.getpid(), arg*arg, time.time()-start,
+            tinv, l, mass)
 
 def getmass(tage):
     #wave, spec = sps.get_spectrum(tage=tage, zmet =
@@ -69,9 +74,9 @@ if __name__ == '__main__':
     fn = open(rp['outfile'],'wb')
     fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(gap.wave), niter, pool.size))
     fn.write('# initial time = {}\n'.format(ts))
-    fn.write('# pid, tid^2, tproc, tinv, mstar\n')
+    fn.write('# pid, tid^2, tproc, tinv, length, mstar\n')
     for i in j:
-        fn.write('{0} {1} {2} {3} {4}\n'.format(*i))
+        fn.write('{0} {1} {2} {3} {4} {5}\n'.format(*i))
     fn.write('# total_time={}'.format(time.time() - total_start))
     fn.close()
     try:
