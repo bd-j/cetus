@@ -48,6 +48,7 @@ try:
     from emcee.utils import MPIPool
     pool = MPIPool(debug = True, loadbalance=True)
     M = pool.map
+    np = pool.size
     if not pool.is_master():
         # Wait for instructions from the master process.
         pool.wait()
@@ -56,7 +57,8 @@ except (ImportError, ValueError):
     pool = None
     M = map
     print('Not using MPI')
-   
+    np = 1
+    
 if __name__ == '__main__':
     try:
         niter = int(sys.argv[1])
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     j = list(M(test, [[i] for i in range(niter)]))
 
     fn = open(rp['outfile'],'wb')
-    fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(gap.wave), niter, pool.size))
+    fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(gap.wave), niter, np))
     fn.write('# initial time = {}\n'.format(ts))
     fn.write('# pid, tid^2, tproc, tinv, length, mstar\n')
     for i in j:
