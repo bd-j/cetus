@@ -10,7 +10,7 @@ tophat = priors.tophat
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/test',
+              'outfile':'results/imf_mock',
               'ftol':0.5e-5, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
               'nburn':[64, 128, 256], 'niter':512,
@@ -23,8 +23,8 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              'filename':'/Users/bjohnson/projects/cetus/data/mmt/nocal/020.B192-G242.s.fits',
-              "phottable":"/Users/bjohnson/Projects/cetus/data/f2_apcanfinal_6phot_v2.fits",
+              'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/020.B192-G242.s.fits',
+              "phottable":"/work/03291/bdj314/code/cetus/data/f2_apcanfinal_6phot_v2.fits",
               'objname':'B192-G242',
               'wlo':3750., 'whi':7200.
               }
