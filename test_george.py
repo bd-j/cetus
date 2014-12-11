@@ -2,7 +2,9 @@
 import sys, getopt, os, time
 total_start = time.time()
 import numpy as np
-from bsfh import gp, sps_basis
+import george
+from george.kernels import ExpSquaredKernel, WhiteKernel
+from bsfh import sps_basis
 import fsps
 from sedpy.attenuation import cardelli
 
@@ -18,18 +20,19 @@ try:
     nw = int(sys.argv[2])
 except(IndexError):
     nw = -1
-gap = gp.GaussianProcess(wave[0:nw], sigma[0:nw])
+
+ww, ss = wave[0:nw], sigma[0:nw]
 
 def test(args):
     #start =time.time()
     arg  = args[0]
     #gaproc = args[1]
     a, s, l = 0.1, 0.0, 100.0*np.random.uniform(0,1)#arg**(0.5) + 10
+    kernel = a**2 * ExpSquaredKernel(l**2) + WhiteKernel(s**2)
+    gp = george.GP(kernel, solver=george.HODLRSolver)
     tinv = time.time()
-    gap.factor(s,a,l, check_finite=False)
+    gp.compute(ww, ss)
     tinv = time.time() - tinv
-    gap.factorized_Sigma = None
-    gap.a = None
     mass = getmass(arg**(0.5)/5.+0.1)
     return (os.getpid(), arg*arg, time.time()-start,
             tinv, l, mass)
@@ -65,17 +68,13 @@ if __name__ == '__main__':
         niter = int(sys.argv[1])
     except(IndexError):
         niter = 64
-    rp = { 'outfile':'test_mpi_{:.0f}.dat'.format(total_start)}
-    #gap = gp.GaussianProcess(wave, sigma)
-    a, s, l = 0.1, 0.0, 0.1
-    #gap.factor(s, a, l)
-    #gap.factorized_Sigma=None
+    rp = { 'outfile':'test_george_{:.0f}.dat'.format(total_start)}
     ts = time.time() - total_start
     
     j = list(M(test, [[i] for i in range(niter)]))
 
     fn = open(rp['outfile'],'wb')
-    fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(gap.wave), niter, ncpu))
+    fn.write('# nw={0}, niter={1}, np={2}\n'.format( len(ww), niter, ncpu))
     fn.write('# initial time = {}\n'.format(ts))
     fn.write('# pid, tid^2, tproc, tinv, length, mstar\n')
     for i in j:
