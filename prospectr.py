@@ -134,7 +134,7 @@ if __name__ == "__main__":
     _ = model_setup.parse_args(sys.argv, argdict=model.run_params)
     model.run_params['sys.argv'] = sys.argv
     rp = model.run_params #shortname
-    initial_theta = model.initial_theta
+    initial_theta = np.copy(model.initial_theta)
     if rp['verbose']:
         print(model.params)
     if rp.get('debug', False):
@@ -147,21 +147,24 @@ if __name__ == "__main__":
     #################
     #INITIAL GUESS(ES) USING POWELL MINIMIZATION
     #################
-    if rp['verbose']:
-        print('minimizing chi-square...')
-    ts = time.time()
-    powell_opt = {'ftol': rp['ftol'], 'xtol':1e-4, 'maxfev':rp['maxfev']}
-    powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
-                                       method ='powell', opts=powell_opt,
-                                       pool = pool, nthreads = rp.get('nthreads',1))
+    if rp['do_powell']:
+        if rp['verbose']:
+            print('minimizing chi-square...')
+        ts = time.time()
+        powell_opt = {'ftol': rp['ftol'], 'xtol':1e-4, 'maxfev':rp['maxfev']}
+        powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
+                                        method ='powell', opts=powell_opt,
+                                        pool = pool, nthreads = rp.get('nthreads',1))
     
-    best = np.argmin([p.fun for p in powell_guesses])
-    best_guess = powell_guesses[best]
-    pdur = time.time() - ts
-    
-    if rp['verbose']:
-        print('done Powell in {0}s'.format(pdur))
-
+        best = np.argmin([p.fun for p in powell_guesses])
+        best_guess = powell_guesses[best]
+        pdur = time.time() - ts
+        initial_center = best_guess.x
+        if rp['verbose']:
+            print('done Powell in {0}s'.format(pdur))
+    else:
+        initial_center = initial_theta
+        
     ###################
     #SAMPLE
     ####################
@@ -169,7 +172,6 @@ if __name__ == "__main__":
     if rp['verbose']:
         print('emcee sampling...')
     tstart = time.time()
-    initial_center = best_guess.x
     esampler = utils.run_emcee_sampler(model, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
     if rp['verbose']:
