@@ -10,7 +10,7 @@ tophat = priors.tophat
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_mock',
+              'outfile':'results/imf_mock_young',
               'ftol':0.5e-5, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
               'nburn':[64, 128, 256], 'niter':512,
@@ -64,7 +64,7 @@ model_params.append({'name': 'mass', 'N': 1,
 
 model_params.append({'name': 'tage', 'N': 1,
                         'isfree': True,
-                        'init': 0.250,
+                        'init': 0.05,
                         'units': 'Gyr',
                         'prior_function':tophat,
                         'prior_args':{'mini':0.001, 'maxi':2.5}})
@@ -141,8 +141,8 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'isfree': True,
                         'init': 2.2,
                         'units': r'$\AA$',
-                        'prior_function': tophat,
-                        'prior_args': {'mini':1.0, 'maxi':6.0}})
+                        'prior_function': priors.lognormal,
+                        'prior_args': {'log_mean':np.log(2.2)+0.25/2, 'sigma':0.25}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
@@ -254,7 +254,7 @@ model_params.append({'name': 'emission_disp', 'N': 1, 'isfree': False,
 mock_info = {}
 mock_info['filters'] = obs['filters']
 mock_info['wavelength'] = obs['wavelength'][obs['mask']]
-mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.1,
+mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.05,
                        'imf3':2.7,
                        'dust2':0.3, 'sigma_smooth':2.2, 'zred':1e-4,
                        'spec_norm':1.0, 'poly_coeffs':[0.0, 0.0],

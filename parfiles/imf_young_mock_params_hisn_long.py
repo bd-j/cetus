@@ -10,10 +10,10 @@ tophat = priors.tophat
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_mock',
-              'ftol':0.5e-5, 'maxfev':10000,
+              'outfile':'results/imf_mock_young',
+              'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[64, 128, 256], 'niter':512,
+              'nburn':[64, 128, 256], 'niter':8192,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':True,
@@ -64,7 +64,7 @@ model_params.append({'name': 'mass', 'N': 1,
 
 model_params.append({'name': 'tage', 'N': 1,
                         'isfree': True,
-                        'init': 0.250,
+                        'init': 0.05,
                         'units': 'Gyr',
                         'prior_function':tophat,
                         'prior_args':{'mini':0.001, 'maxi':2.5}})
@@ -141,8 +141,8 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'isfree': True,
                         'init': 2.2,
                         'units': r'$\AA$',
-                        'prior_function': tophat,
-                        'prior_args': {'mini':1.0, 'maxi':6.0}})
+                        'prior_function': priors.lognormal,
+                        'prior_args': {'log_mean':np.log(2.2)+0.25/2, 'sigma':0.25}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
@@ -164,10 +164,10 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 polyorder = 2
 polymin = [-1000, -3000]
 polymax = [1000, 3000]
-polyinit = [0.1, 0.1]
+polyinit = [0.0, 0.0]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
-                        'isfree': True,
+                        'isfree': False,
                         'init': polyinit,
                         'units': None,
                         'prior_function': tophat,
@@ -178,24 +178,24 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'init':1,
                         'units': None,
                         'prior_function': tophat,
-                        'prior_args': {'mini':0.1, 'maxi':10}})
+                        'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': True,
-                        'init': 0.001,
+                        'isfree': False,
+                        'init': 0.000,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': True,
-                        'init': 0.04,
+                        'isfree': False,
+                        'init': 0.00,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': True,
+                        'isfree': False,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
@@ -254,7 +254,7 @@ model_params.append({'name': 'emission_disp', 'N': 1, 'isfree': False,
 mock_info = {}
 mock_info['filters'] = obs['filters']
 mock_info['wavelength'] = obs['wavelength'][obs['mask']]
-mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.1,
+mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.05,
                        'imf3':2.7,
                        'dust2':0.3, 'sigma_smooth':2.2, 'zred':1e-4,
                        'spec_norm':1.0, 'poly_coeffs':[0.0, 0.0],
@@ -262,8 +262,8 @@ mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.1,
                        'emission_luminosity': nlines * [0.0]}
 psnr = obs['maggies']/obs['maggies_unc']
 psnr[~np.isfinite(psnr)] = 3
-mock_info['phot_snr'] = 20.0
-mock_info['spec_snr'] = (obs['spectrum']/obs['unc'])[obs['mask']]
+mock_info['phot_snr'] = 30.0
+mock_info['spec_snr'] = 5 * (obs['spectrum']/obs['unc'])[obs['mask']]
 
 #rp_uncal = deepcopy(run_params)
 #rp_uncal['filename'] = rp_uncal['filename'].replace('.s.fits','.v.fits')
