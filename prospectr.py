@@ -150,7 +150,7 @@ if __name__ == "__main__":
     if rp['verbose']:
         print('minimizing chi-square...')
     ts = time.time()
-    powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6, 'maxfev':rp['maxfev']}
+    powell_opt = {'ftol': rp['ftol'], 'xtol':1e-4, 'maxfev':rp['maxfev']}
     powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
                                        method ='powell', opts=powell_opt,
                                        pool = pool, nthreads = rp.get('nthreads',1))

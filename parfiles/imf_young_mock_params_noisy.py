@@ -10,10 +10,10 @@ tophat = priors.tophat
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_mock_young_losn_long',
-              'ftol':0.5e-4, 'maxfev':10000,
+              'outfile':'results/imf_mock_young',
+              'ftol':0.5e-5, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[256, 512, 1024], 'niter':8192,
+              'nburn':[64, 128, 256], 'niter':512,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':True,
@@ -164,10 +164,10 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 polyorder = 2
 polymin = [-1000, -3000]
 polymax = [1000, 3000]
-polyinit = [0.0, 0.0]
+polyinit = [0.1, 0.1]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
-                        'isfree': False,
+                        'isfree': True,
                         'init': polyinit,
                         'units': None,
                         'prior_function': tophat,
@@ -178,24 +178,24 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'init':1,
                         'units': None,
                         'prior_function': tophat,
-                        'prior_args': {'mini':0.2, 'maxi':5}})
+                        'prior_args': {'mini':0.1, 'maxi':10}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.000,
+                        'isfree': True,
+                        'init': 0.001,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 0.04,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
@@ -262,8 +262,8 @@ mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.05,
                        'emission_luminosity': nlines * [0.0]}
 psnr = obs['maggies']/obs['maggies_unc']
 psnr[~np.isfinite(psnr)] = 3
-mock_info['phot_snr'] = 30.0
-mock_info['spec_snr'] = 2 * (obs['spectrum']/obs['unc'])[obs['mask']]
+mock_info['phot_snr'] = 20.0
+mock_info['spec_snr'] = (obs['spectrum']/obs['unc'])[obs['mask']]
 
 #rp_uncal = deepcopy(run_params)
 #rp_uncal['filename'] = rp_uncal['filename'].replace('.s.fits','.v.fits')

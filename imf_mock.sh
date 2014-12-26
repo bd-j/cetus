@@ -11,6 +11,6 @@
 ### Job name
 #SBATCH -J 'imf_mock'
 ### output and error logs
-#SBATCH -o imfmock_%j.out
-#SBATCH -e imfmock_%j.err
+#SBATCH -o imfmock_losn_long_%j.out
+#SBATCH -e imfmock_losn_long_%j.err
 ibrun python-mpi prospectr.py --param_file=parfiles/imf_young_mock_params.py --nwalkers=126

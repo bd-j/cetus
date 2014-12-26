@@ -10,10 +10,10 @@ tophat = priors.tophat
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_mock_young_losn_long',
+              'outfile':'results/imf_mock_young',
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[256, 512, 1024], 'niter':8192,
+              'nburn':[64, 128, 256], 'niter':8192,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':True,
@@ -263,7 +263,7 @@ mock_info['params'] = {'sfh':0, 'mass':1e4, 'zmet':-0.1, 'tage':0.05,
 psnr = obs['maggies']/obs['maggies_unc']
 psnr[~np.isfinite(psnr)] = 3
 mock_info['phot_snr'] = 30.0
-mock_info['spec_snr'] = 2 * (obs['spectrum']/obs['unc'])[obs['mask']]
+mock_info['spec_snr'] = 5 * (obs['spectrum']/obs['unc'])[obs['mask']]
 
 #rp_uncal = deepcopy(run_params)
 #rp_uncal['filename'] = rp_uncal['filename'].replace('.s.fits','.v.fits')
