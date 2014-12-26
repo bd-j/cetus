@@ -25,8 +25,8 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              #'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly.p',
-              'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly.p',
+              'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly.p',
+              #'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly.p',
               'mock_snr_factor': 1.0,
               'wlo':3750., 'whi':7200.
               }
