@@ -9,8 +9,8 @@
 ### memory per cpu, in MB
 
 ### Job name
-#SBATCH -J 'imf_mock'
+#SBATCH -J 'imf_dmock'
 ### output and error logs
-#SBATCH -o imfmock_losn_long_%j.out
-#SBATCH -e imfmock_losn_long_%j.err
-ibrun python-mpi prospectr.py --param_file=parfiles/imf_young_mock_params.py --nwalkers=126
+#SBATCH -o imf_dmock_long_%j.out
+#SBATCH -e imf_dmock_long_%j.err
+ibrun python-mpi prospectr.py --param_file=parfiles/imf_young_deterministicmock_params.py --nwalkers=126

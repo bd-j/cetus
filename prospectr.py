@@ -137,6 +137,7 @@ if __name__ == "__main__":
     initial_theta = np.copy(model.initial_theta)
     if rp['verbose']:
         print(model.params)
+	print(model.initial_theta)
     if rp.get('debug', False):
         try:
             pool.close()
@@ -164,7 +165,8 @@ if __name__ == "__main__":
             print('done Powell in {0}s'.format(pdur))
     else:
         initial_center = initial_theta
-        
+	powell_guesses = None 
+      	pdur = 0.0 
     ###################
     #SAMPLE
     ####################
