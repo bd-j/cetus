@@ -1,10 +1,68 @@
 \section{Code Description}
 
-Our code performs inference of star cluster parameters through MCMC sampling of the posterior probability distribution.  This entails evaluating the posterior probability for a large dimensional parameter space.  The function which defines the posteriror probability muster therfore be evaluated many thousands of times.
+Information about the properties of a stellar cluster -- its age,
+metallicity, total stellar mass, and reddening by dust among many
+others -- is contained in the detailed spectrum and the broadband SED
+of the cluster. Our code performs inference of these star cluster
+parameters by comparing model spectra and photometry to observations
+for a broad range of model parameters.  This is accomplished in the
+framework of a likelihood function for the data given the model
+parameters.
+
+The high dimensionality of the parameter space, the desire to robustly
+infer degeneracies between the parameters, the presence of informative
+prior information abou tthe parameters, and the need marginalize over
+``nuisance'' parameters leads us to a Bayesian methodolgy based on
+Markov Chain Monte Carlo (MCMC) sampling of the likelihood function.
+
+The heart of our star cluster modeling code consists of the FSPS
+stellar population synthesis code \citep{fsps} (written in Fortran but
+wrapped in Python bindings), combined with a flexible spectroscopic
+calibration model.  For the MCMC sampling we are using the
+affine-invariant ensemble sampler \texttt{emcee} \citep{emcee} which
+enables the likelihood function evaluations to parallelized across a
+large number CPUs.
 
 \subsection{Star cluster model}
+For each set of model parameters a star cluster model must be
+generated and compared to the data. The star cluster model is
+comprised of a physical model for the spectrum and broadband SED of
+the cluster and a model for the instrumental calibration.  The
+physical model is generated using the FSPS stellar population
+synthesis code, which combines tabulated model stellar spectra
+according to weights determined from tabulated stellar evolutionary
+tracks and an initial mass function.  The FSPS code additionally
+calculates the reddening due to dust and convolves the spectrum with a
+broadening function representing the instrumental spectral resolution.
 
-\subsection{Noise modeling}
+\subsubsection{Calibration modeling}
+The absolute flux calibration of spectroscopic data is generally
+inferior to that of photometric data.  In order to simultaneously model
+the observed spectra and photometry we have included a very flexible
+spectroscopic calibration model based on a combination of a low-order
+polynomial and a Gaussian Process.
 
 \subsection{MCMC}
 For our MCMC
+
+
+\section{Computational Procedure}
+
+\subsection{Observational Data}
+Preprocessing and uploading to Stampede
+
+\subsection{Job submission}
+We will submit a separate job for each cluster spectrum. normal queue
+
+\subsection{Job details}
+For each spectrum, an intial round of optimization of the likelihood
+function (actually the posterior probability function) is used to find
+the approximate maximum likelihood. This optimization uses Powell's
+method as implemented in Scipy, though we are investigating more
+efficient algorithms. The optimization is started from as many
+positions as there are processors. Thus increasing the number of
+processors does not speed up this phase of the code, it does
+substantially reduce the chance of becoming tapped in a local minimum.
+After the separate optimizations have converged or reached a maximum
+number of iterations, the parameters corresponding to the global
+minimum are used as a central location for the MCMC sampling.
