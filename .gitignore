@@ -1,3 +1,5 @@
+*err
+*out
 misc/*
 detritus/
 .DS_Store

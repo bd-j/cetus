@@ -15,7 +15,7 @@ run_params = {'verbose':True,
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[64, 128, 256, 512, 1024], 'niter':8192,
+              'nburn':[64, 128, 256, 512, 1024], 'niter':4096,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
