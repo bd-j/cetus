@@ -7,43 +7,90 @@ of the cluster. Our code performs inference of these star cluster
 parameters by comparing model spectra and photometry to observations
 for a broad range of model parameters.  This is accomplished in the
 framework of a likelihood function for the data given the model
-parameters.
+parameters.  
 
 The high dimensionality of the parameter space, the desire to robustly
 infer degeneracies between the parameters, the presence of informative
-prior information abou tthe parameters, and the need marginalize over
-``nuisance'' parameters leads us to a Bayesian methodolgy based on
-Markov Chain Monte Carlo (MCMC) sampling of the likelihood function.
+prior information about the parameters, and the need marginalize over
+``nuisance'' parameters all lead us to a Bayesian methodology based on
+Markov Chain Monte Carlo (MCMC) sampling of the likelihood
+function. The combination of photometric and spectroscopic information
+requires a flexible noise model to account for spectroscopic
+calibration uncertainties.
 
-The heart of our star cluster modeling code consists of the FSPS
-stellar population synthesis code \citep{fsps} (written in Fortran but
-wrapped in Python bindings), combined with a flexible spectroscopic
-calibration model.  For the MCMC sampling we are using the
-affine-invariant ensemble sampler \texttt{emcee} \citep{emcee} which
-enables the likelihood function evaluations to parallelized across a
-large number CPUs.
+The heart of our star cluster modeling code consists of the
+\texttt{FSPS} stellar population synthesis code \citep{fsps}, combined
+with a flexible spectroscopic calibration model.  For the MCMC
+sampling we are using the affine-invariant ensemble sampler
+\texttt{emcee} \citep{emcee} which enables the likelihood function
+evaluations to parallelized across a large number CPUs. The main
+calculations of \texttt{FSPS} are done in Fortran, but the code is
+wrapped in Python.  \texttt{emcee} is written in Python and uses
+\texttt{mpi4py} to distribute likelihood calcualtions across CPUs.
 
 \subsection{Star cluster model}
 For each set of model parameters a star cluster model must be
 generated and compared to the data. The star cluster model is
 comprised of a physical model for the spectrum and broadband SED of
-the cluster and a model for the instrumental calibration.  The
-physical model is generated using the FSPS stellar population
-synthesis code, which combines tabulated model stellar spectra
-according to weights determined from tabulated stellar evolutionary
-tracks and an initial mass function.  The FSPS code additionally
-calculates the reddening due to dust and convolves the spectrum with a
-broadening function representing the instrumental spectral resolution.
+and a model for the instrumental calibration.  The physical model is
+generated using the FSPS stellar population synthesis code, which
+combines tabulated model stellar spectra according to weights
+determined from tabulated stellar evolutionary tracks and an initial
+mass function.  The FSPS code additionally calculates the reddening
+due to dust and convolves the spectrum with a broadening function
+representing the instrumental spectral resolution.
+
+The model generation takes approximately 1s on 
 
 \subsubsection{Calibration modeling}
 The absolute flux calibration of spectroscopic data is generally
-inferior to that of photometric data.  In order to simultaneously model
-the observed spectra and photometry we have included a very flexible
-spectroscopic calibration model based on a combination of a low-order
-polynomial and a Gaussian Process.
+inferior to that of photometric data.  While spectroscopic features
+such as absorption line depths provide substantial information about
+the stellar population parameters, large scale features in the
+observed spectrum and its overall normalization are often affected by
+substantial (multiplicative) calibration uncertainties. In order to
+simultaneously model the observed spectra and the photometry we have
+included a very flexible spectroscopic calibration model based on a
+combination of a low-order polynomial function of wavelength and a
+Gaussian Process.
+
+The low order polynomial corresponds to gross features in the
+calibration as a function of wavelength, while the Gaussian Process
+corresponds to smaller scale deviations away from the polynomial,
+which can be thought of as covariant uncertainties on the fluxes of
+datapoints close in wavelength.
+
+Determining the likelihood in the presence of the covariant
+uncertainties requires inverting $N \times N$ matrices, where $N$ is
+the number of wavelength points.  This is accomplished using Cholesky
+decompositions, as implemented in \texttt{Scipy}.  For our data,
+N$\sim 2500$.  On Stampede the matrix inversion takes approximately 1s
+on a single processor, using the linked Intel MKL library.
 
 \subsection{MCMC}
-For our MCMC
+For our MCMC sampling we are using the code \texttt{emcee}.  This code
+implements an affine-invariant ensemble sampler \citep{goodman_weare}
+which is based on an ensemble of ``walkers'' in parameter space that,
+at each iteration of the sampler, are used to generate new proposal
+positions in parameter space.  This eliminates the need for
+hand-tuning of the proposal length scales.  Additionally, the
+likelihood calculations for the different walkers at a given iteration
+can be simply parallelized.
+
+Parallelization is accomplished as follows. The parameter position of
+each walker is sent to a separate processor for the likelihood
+evaluation. The likelihoods are then collected and used to generate
+new proposed parameter positions for each walker, and a new iteration
+is begun.  The density of walker positions constitutes an
+approximation to the posterior probability distribution for the
+parameters.
+
+Since the run time of our code is dominated by the likelihood
+calculations, this parallelization scheme results in very good scaling
+with the number of processors, as long as the number of walkers is
+larger than the number of processors.  The only data being
+communicated between processors are vectors of parameter positions and
+the corresponding likelihood (scalars).
 
 
 \section{Computational Procedure}
@@ -55,14 +102,37 @@ Preprocessing and uploading to Stampede
 We will submit a separate job for each cluster spectrum. normal queue
 
 \subsection{Job details}
-For each spectrum, an intial round of optimization of the likelihood
+Each CPU loads a copy of the likelihood function into memory,
+including the FSPS star cluster modelling code and the spectroscopic
+calibration model.
+
+For each spectrum, an initial round of optimization of the likelihood
 function (actually the posterior probability function) is used to find
 the approximate maximum likelihood. This optimization uses Powell's
-method as implemented in Scipy, though we are investigating more
-efficient algorithms. The optimization is started from as many
-positions as there are processors. Thus increasing the number of
-processors does not speed up this phase of the code, it does
-substantially reduce the chance of becoming tapped in a local minimum.
-After the separate optimizations have converged or reached a maximum
-number of iterations, the parameters corresponding to the global
-minimum are used as a central location for the MCMC sampling.
+method as implemented in \texttt{Scipy}, though we are investigating
+more efficient algorithms. The optimization is started from as many
+positions as there are CPUs available in the job, with each CPU
+performing one realization of the optimization.  Thus while increasing
+the number of processors does not speed up this phase of the code, it
+does substantially reduce the chance of becoming tapped in a local
+minimum.
+
+After the separate optimizations have each converged or reached a
+maximum number of iterations, the parameters corresponding to the
+global minimum are used as a central location for the MCMC sampling.
+An ensemble of ``walkers'' is then generated centered on this location
+and evolved forward.  The resulting 
+
+\subsection{Post-Processing}
+The stored walker positions are transferred to local servers to run
+our custom diagnostic and visualization software.  In cases where the
+walkers in the sampler have not converged to a stationary distribution
+in parameter space, we can restart the sampler from the last ensemble
+of positions, thus taking advantage of previous computations.  We are
+investigating techniques for robust online assesment of sampler
+convergence.
+
+
+\section{Requested Resources}
+Our tests indicate that fro each spectrum approximately X iterations
+of Y walkers are required for convergence of a sampler
