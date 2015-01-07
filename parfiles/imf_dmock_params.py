@@ -11,11 +11,11 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_short',
+              'outfile':'results/imf_dmock_snrx2_long',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[64, 128, 256, 512, 1024], 'niter':4096,
+              'nburn':[128, 256, 512, 512, 1024], 'niter':8192,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
@@ -219,9 +219,9 @@ linelist = ['CaII_K', 'NaI_5891', 'NaI_5897',
             'HeI_3821','HeI_4010','HeI_4027','HeI_4145','HeI_4389',
             'HeI_4473','HeI_4923','HeI_5017'
             ]
-linemin = 3 * [-100] + 4 * [0.]  + 8 * [-50.0 ]
-linemax = 3 * [0.] + 4 * [100.0 ] + 8 * [50.0 ]
-lineinit = 3 * [-0.1 ] + 4 * [1.0 ] + 8 * [0.1 ]
+linemin = 3 * [-1] + 4 * [0.]  + 8 * [-50.0 ]
+linemax = 3 * [0.] + 4 * [10.0 ] + 8 * [50.0 ]
+lineinit = 3 * [-0.1e-10 ] + 4 * [0.1e-10 ] + 8 * [0.1e-10 ]
 
 linelist = linelist[0:3]
 linemin = linemin[0:3]
