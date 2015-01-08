@@ -11,7 +11,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long',
+              'outfile':'results/imf_dmock_snrx2_long_nolines',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -221,7 +221,7 @@ linelist = ['CaII_K', 'NaI_5891', 'NaI_5897',
             ]
 linemin = 3 * [-1] + 4 * [-1e-8]  + 8 * [-50.0 ]
 linemax = 3 * [1e-8] + 4 * [10.0 ] + 8 * [50.0 ]
-lineinit = 3 * [-0.1e-10 ] + 4 * [0.1e-10 ] + 8 * [0.1e-10 ]
+lineinit = 3 * [0.0 ] + 4 * [0.1e-10 ] + 8 * [0.1e-10 ]
 
 linelist = linelist[0:3]
 linemin = linemin[0:3]
@@ -238,7 +238,7 @@ model_params.append({'name': 'emission_rest_wavelengths', 'N': nlines,
                         'units': r'$\AA$'})
 
 model_params.append({'name': 'emission_luminosity', 'N': nlines,
-                        'isfree': True,
+                        'isfree': False,
                         'init': lineinit,
                         'units': r'$L_\odot$',
                         'prior_function':tophat,
