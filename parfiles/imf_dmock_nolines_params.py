@@ -11,7 +11,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly',
+              'outfile':'results/imf_dmock_snrx2_long_nolines',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -166,12 +166,12 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 ###### CALIBRATION ###########
 
 polyorder = 2
-polymin = [1e4, -1e5]
-polymax = [1e4, 1e5]
-polyinit = [0.1, 0.1]
+polymin = [-1000, -3000]
+polymax = [1000, 3000]
+polyinit = [1e-10, 1e-10]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
-                        'isfree': True,
+                        'isfree': False,
                         'init': polyinit,
                         'units': None,
                         'prior_function': tophat,

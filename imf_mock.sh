@@ -8,9 +8,14 @@
 #SBATCH -p normal
 ### memory per cpu, in MB
 
+### Account
+### imf
+#SBATCH -A TG-AST140054
+### PHAT
+
 ### Job name
 #SBATCH -J 'imf_dmock'
 ### output and error logs
-#SBATCH -o imf_dmock_nolines_%j.out
-#SBATCH -e imf_dmock_nolines_%j.err
+#SBATCH -o imf_dmock_nolines_wpoly_%j.out
+#SBATCH -e imf_dmock_nolines_wpoly_%j.err
 ibrun python-mpi prospectr.py --param_file=parfiles/imf_dmock_params.py --nwalkers=126
