@@ -11,7 +11,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly',
+              'outfile':'results/imf_dmock_snrx2_long',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -166,12 +166,12 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 ###### CALIBRATION ###########
 
 polyorder = 2
-polymin = [-1e5, -1e6]
-polymax = [1e5, 1e6]
-polyinit = [0.1, 0.1]
+polymin = [-1000, -3000]
+polymax = [1000, 3000]
+polyinit = [1e-10, 1e-10]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
-                        'isfree': True,
+                        'isfree': False,
                         'init': polyinit,
                         'units': None,
                         'prior_function': tophat,
@@ -203,7 +203,7 @@ model_params.append({'name': 'gp_length', 'N':1,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
-                        'prior_args': {'log_mean':4.0 - 0.5/2.0, 'sigma':0.5}})
+                        'prior_args': {'log_mean':4.0, 'sigma':0.5}})
 
 model_params.append({'name': 'phot_jitter', 'N':1,
                         'isfree': False,
@@ -221,7 +221,7 @@ linelist = ['CaII_K', 'NaI_5891', 'NaI_5897',
             ]
 linemin = 3 * [-1] + 4 * [-1e-8]  + 8 * [-50.0 ]
 linemax = 3 * [1e-8] + 4 * [10.0 ] + 8 * [50.0 ]
-lineinit = 3 * [0.0 ] + 4 * [0.1e-10 ] + 8 * [0.1e-10 ]
+lineinit = 3 * [-0.1e-10 ] + 4 * [0.1e-10 ] + 8 * [0.1e-10 ]
 
 linelist = linelist[0:3]
 linemin = linemin[0:3]
@@ -238,7 +238,7 @@ model_params.append({'name': 'emission_rest_wavelengths', 'N': nlines,
                         'units': r'$\AA$'})
 
 model_params.append({'name': 'emission_luminosity', 'N': nlines,
-                        'isfree': False,
+                        'isfree': True,
                         'init': lineinit,
                         'units': r'$L_\odot$',
                         'prior_function':tophat,
