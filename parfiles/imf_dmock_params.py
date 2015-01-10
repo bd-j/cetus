@@ -166,8 +166,8 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 ###### CALIBRATION ###########
 
 polyorder = 2
-polymin = [-1e5, -1e6]
-polymax = [1e5, 1e6]
+polymin = [-1e6, -1e6]
+polymax = [1e6, 1e6]
 polyinit = [0.1, 0.1]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
@@ -185,21 +185,21 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.000,
+                        'isfree': True,
+                        'init': 1e-5,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 1e-5,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
