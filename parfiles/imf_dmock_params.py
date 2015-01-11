@@ -11,7 +11,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly',
+              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly_wgp',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
