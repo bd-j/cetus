@@ -11,7 +11,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly_wgp',
+              'outfile':'results/imf_dmock_snrx2_long_nolines_wnewpoly',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -25,8 +25,8 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              #'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
-              'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
+              'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
+              #'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
               'mock_snr_factor': 2.0,
               'noiseless': True,
               'wlo':3750., 'whi':7200.
