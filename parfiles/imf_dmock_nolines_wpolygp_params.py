@@ -25,8 +25,8 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              #'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
-              'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
+              'filename':'/work/03291/bdj314/code/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
+              #'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
               'mock_snr_factor': 2.0,
               'noiseless': True,
               'wlo':3750., 'whi':7200.
@@ -166,9 +166,9 @@ model_params.append({'name': 'max_wave_smooth', 'N': 1,
 ###### CALIBRATION ###########
 
 polyorder = 2
-polymin = [-1e1, -1e1]
-polymax = [1e1, 1e1]
-polyinit = [1e-2, 1e-2]
+polymin = [-1e6, -1e6]
+polymax = [1e6, 1e6]
+polyinit = [0.1, 0.1]
 
 model_params.append({'name': 'poly_coeffs', 'N': polyorder,
                         'isfree': True,
@@ -179,27 +179,27 @@ model_params.append({'name': 'poly_coeffs', 'N': polyorder,
     
 model_params.append({'name': 'spec_norm', 'N':1,
                         'isfree': True,
-                        'init':1.00001,
+                        'init':1,
                         'units': None,
                         'prior_function': tophat,
                         'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.0,
+                        'isfree': True,
+                        'init': 1e-5,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
-                        'init': 0.0,
+                        'isfree': True,
+                        'init': 1e-5,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
