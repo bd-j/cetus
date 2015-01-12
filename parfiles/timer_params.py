@@ -7,19 +7,6 @@ tophat = priors.tophat
 import pickle
 
 
-def add_wiggles(datadir="/work/03291/bdj314/code/cetus/data/", **extras):
-    pars = {'phottable':datadir + "f2_apcanfinal_6phot_v2.fits",
-            'objname':'B192-G242',
-            'wlo':3750., 'whi':7200.
-            }
-    calname = datadir + "mmt/nocal/020.B192-G242.s.fits"
-    uncalname = datadir + "mmt/nocal/020.B192-G242.v.fits"
-            
-    cal = load_obs_mmt(filename=calname, **pars)
-    uncal = load_obs_mmt(filename=uncalname, **pars)
-    calibration = (uncal['spectrum']/cal['spectrum'])[cal['mask']]
-    return calibration
-    
 def add_poly(obs, c, norm_band_name = 'f475w', **extras):
     norm_band = [i for i,f in enumerate(obs['filters']) if norm_band_name in f.name][0]
     c = np.array(c)
@@ -35,11 +22,11 @@ def add_poly(obs, c, norm_band_name = 'f475w', **extras):
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wpoly_wgp',
+              'outfile':'results/timing_test',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[128, 256, 512, 512, 1024], 'niter':8192,
+              'nburn':[32], 'niter':64,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
@@ -53,8 +40,7 @@ run_params = {'verbose':True,
               'filename': '/Users/bjohnson/Projects/cetus/data/mock/mock_cluster_SNRx5_nopoly_noiseless.p',
               'mock_snr_factor': 2.0,
               'noiseless': True,
-              'add_mock_poly': [0.0, 0.2, -1],
-              'add_wiggles': False,
+              'add_mock_poly': [0.0, 0.2, -1], 
               'wlo':3750., 'whi':7200.
               }
 
@@ -65,16 +51,11 @@ amock = pickle.load( open(run_params['filename']))
 obs = amock['obs']
 obs['unc'] *= (amock['mock_snr_factor']/ run_params['mock_snr_factor'])
 mockpolypar = run_params.get('add_mock_poly', None)
-wiggles = run_params.get('add_wiggles', False)
-if (mockpolypar is not None) and (wiggles is False):
+if mockpolypar is not None:
     poly = np.exp(add_poly(obs, mockpolypar, **run_params))
     obs['spectrum'] *= poly
     obs['unc'] *= poly
-elif wiggles:
-    cal_wiggles = add_wiggles()
-    obs['spectrum'] *= cal_wiggles
-    obs['unc'] *= cal_wiggles
-    
+
 #############
 # MODEL_PARAMS
 #############
@@ -221,21 +202,21 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 0.0,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 0.0,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
