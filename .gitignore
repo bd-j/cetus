@@ -10,3 +10,7 @@ dali_logs/
 odyssey_logs/
 hyades_logs/
 *pyc
+*.aux
+docs/*.log
+*.dvi
+*.pdf
