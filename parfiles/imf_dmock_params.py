@@ -35,11 +35,11 @@ def add_poly(obs, c, norm_band_name = 'f475w', **extras):
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_long_nolines_wnewpoly',
+              'outfile':'results/imf_dmock_snrx2_nolines_wnewpoly_polydata',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[128, 256, 512, 512, 1024], 'niter':8192,
+              'nburn':[128, 128, 256, 512], 'niter':8192,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
@@ -54,7 +54,7 @@ run_params = {'verbose':True,
               'mock_snr_factor': 2.0,
               'noiseless': True,
               'add_mock_poly': [0.0, 0.2, -1],
-              'add_wiggles': False,
+              'add_wiggles': True,
               'wlo':3750., 'whi':7200.
               }
 

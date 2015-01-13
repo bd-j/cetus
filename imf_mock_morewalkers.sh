@@ -16,6 +16,6 @@
 ### Job name
 #SBATCH -J 'imf_dmock_morewalkers'
 ### output and error logs
-#SBATCH -o imf_dmock_nolines_wpoly_morewalkers_%j.out
-#SBATCH -e imf_dmock_nolines_wpoly_morewalkers_%j.err
+#SBATCH -o imf_dmock_nolines_wpoly_dpoly_mwk_%j.out
+#SBATCH -e imf_dmock_nolines_wpoly_dpoly_mwk_%j.err
 ibrun python-mpi prospectr.py --param_file=parfiles/imf_dmock_params.py --nwalkers=254 --niter=4096
