@@ -35,11 +35,11 @@ def add_poly(obs, c, norm_band_name = 'f475w', **extras):
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/imf_dmock_snrx2_nolines_wnewpoly_polydata',
+              'outfile':'results/imf_dmock_scaling',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[128, 128, 256, 256, 512, 1024], 'niter':8192,
+              'nburn':[32, 32, 32], 'niter':128,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
@@ -54,7 +54,7 @@ run_params = {'verbose':True,
               'mock_snr_factor': 2.0,
               'noiseless': True,
               'add_mock_poly': [0.0, 0.2, -1],
-              'add_wiggles': False,
+              'add_wiggles': True,
               'wlo':3750., 'whi':7200.
               }
 
@@ -66,8 +66,6 @@ obs = amock['obs']
 obs['unc'] *= (amock['mock_snr_factor']/ run_params['mock_snr_factor'])
 mockpolypar = run_params.get('add_mock_poly', None)
 wiggles = run_params.get('add_wiggles', False)
-obs['add_mock_poly'] = mockpolypar
-obs['add_wiggles'] = wiggles
 if (mockpolypar is not None) and (wiggles is False):
     poly = np.exp(add_poly(obs, mockpolypar, **run_params))
     obs['spectrum'] *= poly
@@ -76,8 +74,7 @@ elif wiggles:
     cal_wiggles = add_wiggles()
     obs['spectrum'] *= cal_wiggles
     obs['unc'] *= cal_wiggles
-    obs['add_wiggles'] = cal_wiggles
-
+    
 #############
 # MODEL_PARAMS
 #############
@@ -224,21 +221,21 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 0.0001,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 0.0001,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
