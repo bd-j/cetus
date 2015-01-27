@@ -182,7 +182,8 @@ if __name__ == "__main__":
     ###################
     # PICKLE OUTPUT
     ###################
-    from fsps import fsps_vers
+    #from fsps import fsps_vers
+    fsps_vers = 178
     if len(sps.ssp.wavelengths) > 1e4:
         stellib = 'CKC14'
     else:
