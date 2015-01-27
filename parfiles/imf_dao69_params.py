@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 import numpy as np
 from sedpy import attenuation
@@ -12,7 +13,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/dao69_miles',
+              'outfile':'results/dao69_cal_miles',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -28,14 +29,24 @@ run_params = {'verbose':True,
               'rescale':True,
               'objname': 'DAO69',
               'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/223.DAO69.s.fits',
-              #'filename': '/Users/bjohnson/Projects/cetus/data/223.DAO69.s.fits',
-              'wlo':3750., 'whi':7200.
+              'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
+              'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits',
+              'wlo':3750.,
+              'whi':7200.
               }
+
+if 'bjohnson' in os.getenv('HOME'):
+    for k, v in run_params.iteritems():
+        if type(v) is str:
+            run_params[k] = v.replace('work/03291/bdj314/code','Users/bjohnson/Projects')
 
 ############
 # OBS
 #############
-obs = load_obs_mmt(
+obs = load_obs_mmt(**run_params)
+obs['phot_mask'] = np.array([True, True, True, True, False, False])
+# Mask Halpha+NII
+obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
 
 #############
 # MODEL_PARAMS
@@ -59,17 +70,17 @@ model_params.append({'name': 'lumdist', 'N': 1,
 
 model_params.append({'name': 'mass', 'N': 1,
                      'isfree': True,
-                     'init': 1.5e4,
+                     'init': 10**3.9,
                      'units': r'M$_\odot$',
                      'prior_function': tophat,
-                     'prior_args': {'mini':1e2, 'maxi': 1e6}})
+                     'prior_args': {'mini':1e2, 'maxi': 1e5}})
 
 model_params.append({'name': 'tage', 'N': 1,
                         'isfree': True,
-                        'init': 0.06,
+                        'init': 0.03,
                         'units': 'Gyr',
                         'prior_function':tophat,
-                        'prior_args':{'mini':0.001, 'maxi':2.5}})
+                        'prior_args':{'mini':0.001, 'maxi':1.0}})
 
 model_params.append({'name': 'zmet', 'N': 1,
                         'isfree': True,
@@ -183,21 +194,21 @@ model_params.append({'name': 'spec_norm', 'N':1,
                         'prior_args': {'mini':0.2, 'maxi':5}})
 
 model_params.append({'name': 'gp_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 0.0001,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.2}})
 
 model_params.append({'name': 'gp_amplitude', 'N':1,
-                        'isfree': False,
-                        'init': 0.00,
+                        'isfree': True,
+                        'init': 0.0001,
                         'units': 'spec units',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.5}})
 
 model_params.append({'name': 'gp_length', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,

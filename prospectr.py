@@ -182,6 +182,12 @@ if __name__ == "__main__":
     ###################
     # PICKLE OUTPUT
     ###################
+    from fsps import fsps_vers
+    if len(sps.ssp.wavelengths) > 1e4:
+        stellib = 'CKC14'
+    else:
+        stellib = 'MILES'
+    model.run_params['fsps_vers'] = (fsps_vers, stellib)
     write_results.write_pickles(model, esampler, powell_guesses,
                                 toptimize=pdur, tsample=edur,
                                 sampling_initial_center=initial_center)
