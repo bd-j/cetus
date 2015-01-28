@@ -17,7 +17,7 @@ run_params = {'verbose':True,
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
-              'nburn':[128, 128, 256, 256, 512, 1024], 'niter':8192,
+              'nburn':[256, 512, 512, 1024], 'niter':8192,
               'initial_disp':0.1,
               #'nthreads':1, 'nsamplers':1,
               'mock':False,
@@ -155,7 +155,7 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'init': 2.2,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
-                        'prior_args': {'log_mean':np.log(2.2)+0.25/2, 'sigma':0.25}})
+                        'prior_args': {'log_mean':np.log(2.2)+0.05**2, 'sigma':0.05}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
@@ -212,7 +212,7 @@ model_params.append({'name': 'gp_length', 'N':1,
                         'init': 60.0,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
-                        'prior_args': {'log_mean':4.0 - 1.0/2.0, 'sigma':1.0}})
+                        'prior_args': {'log_mean':np.log(60.0)+1.0**2, 'sigma':1.0}})
 
 model_params.append({'name': 'phot_jitter', 'N':1,
                         'isfree': False,
