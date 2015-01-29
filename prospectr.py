@@ -88,7 +88,7 @@ def lnprobfn(theta, mod):
                                                      dtype= bool))
             jitter = mod.params.get('phot_jitter',0)
             maggies = mod.obs['maggies']
-            phot_var = (mod.obs['maggies_unc'] + jitter)**2
+            phot_var = mod.obs['maggies_unc']**2 + (jitter*mod.obs['maggies'])**2
             lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var )[pmask].sum()
             lnp_phot +=  -0.5*np.log(phot_var[pmask]).sum()
         else:

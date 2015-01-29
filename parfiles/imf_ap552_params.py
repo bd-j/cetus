@@ -218,8 +218,8 @@ model_params.append({'name': 'gp_length', 'N':1,
                         'prior_args': {'log_mean':np.log(60.0)+1.0**2, 'sigma':1.0}})
 
 model_params.append({'name': 'phot_jitter', 'N':1,
-                        'isfree': False,
-                        'init': 0.0,
+                        'isfree': True,
+                        'init': 1e-4,
                         'units': 'mags',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.1}})
