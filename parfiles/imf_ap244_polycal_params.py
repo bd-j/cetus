@@ -13,7 +13,7 @@ import pickle
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/ap552_cal_miles',
+              'outfile':'results/ap244_1021_cal_miles',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -27,9 +27,9 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              'cal_type': 'exp_poly',
-              'objname': 'AP552',
-              'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/AP552.2011.1024.ms.fits',
+              'cal_type': 'poly',
+              'objname': 'AP244',
+              'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/AP244.2011.1021.ms.fits',
               'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
               'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits',
               'wlo':3750.,
@@ -49,8 +49,8 @@ obs['phot_mask'] = np.array([True, True, True, True, False, False])
 # Mask Halpha+NII
 obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
 obs['mask'] *= ~((obs['wavelength'] > 6705) &  (obs['wavelength'] < 6725))
-obs['mask'] *= ~((obs['wavelength'] > 6290) &  (obs['wavelength'] < 6312))
-obs['mask'] *= ~((obs['wavelength'] > 6250) &  (obs['wavelength'] < 6275))
+obs['mask'] *= ~((obs['wavelength'] > 6705) &  (obs['wavelength'] < 6725))
+obs['mask'] *= ~((obs['wavelength'] > 5452) &  (obs['wavelength'] < 5470))
 
 #############
 # MODEL_PARAMS
@@ -219,8 +219,8 @@ model_params.append({'name': 'gp_length', 'N':1,
                         'prior_args': {'log_mean':np.log(60.0)+1.0**2, 'sigma':1.0}})
 
 model_params.append({'name': 'phot_jitter', 'N':1,
-                        'isfree': True,
-                        'init': 1e-4,
+                        'isfree': False,
+                        'init': 0.0,
                         'units': 'mags',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':0.1}})

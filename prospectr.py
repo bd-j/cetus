@@ -73,8 +73,13 @@ def lnprobfn(theta, mod):
             gp.wave, gp.sigma = mod.obs['wavelength'][mask], mod.obs['unc'][mask]
             #use a residual in log space
             log_mu = np.log(mu)
-            #polynomial in the log
-            log_cal = (mod.calibration(theta))
+            cal = (mod.calibration(theta))
+            if mod.params.get('cal_type', 'exp_poly') is 'poly':
+                #polynomial
+                log_cal = np.log(cal)
+            else:
+                #polynomial in the log
+                log_cal = cal
             delta = (mod.obs['spectrum'] - log_mu - log_cal)[mask]
             gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
                       mod.params['gp_length'], check_finite=False, force=False)
@@ -134,6 +139,10 @@ if __name__ == "__main__":
     _ = model_setup.parse_args(sys.argv, argdict=model.run_params)
     model.run_params['sys.argv'] = sys.argv
     rp = model.run_params #shortname
+    model.params['cal_type'] = rp.get('cal_type', 'exp_poly')
+    if model.params['cal_type'] is 'poly':
+        model.rescale_parameter('spec_norm', lambda x: np.exp(x))
+        model.configure()
     initial_theta = np.copy(model.initial_theta)
     if rp['verbose']:
         print(model.params)
