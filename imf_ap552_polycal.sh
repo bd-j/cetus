@@ -3,7 +3,7 @@
 ### Requested number of nodes
 #SBATCH -n 256
 ### Requested computing time in minutes
-#SBATCH -t 5:00:00
+#SBATCH -t 8:00:00
 ###partition
 #SBATCH -p normal
 ### memory per cpu, in MB

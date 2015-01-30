@@ -155,7 +155,7 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'init': 2.2,
                         'units': r'$\AA$',
                         'prior_function': priors.lognormal,
-                        'prior_args': {'log_mean':np.log(2.2)+0.05**2, 'sigma':0.05}})
+                        'prior_args': {'log_mean':np.log(2.2)+0.25**2, 'sigma':0.25}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
