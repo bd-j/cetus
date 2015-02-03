@@ -162,7 +162,7 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
-                        'init': True,
+                        'init': False,
                         'units': None})
 
 model_params.append({'name': 'min_wave_smooth', 'N': 1,

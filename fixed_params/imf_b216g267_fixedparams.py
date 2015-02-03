@@ -69,22 +69,22 @@ model_params.append({'name': 'lumdist', 'N': 1,
 ###### SFH ################
 
 model_params.append({'name': 'mass', 'N': 1,
-                     'isfree': True,
-                     'init': 10**3.9,
+                     'isfree': False,
+                     'init': 10**4.0,
                      'units': r'M$_\odot$',
                      'prior_function': tophat,
                      'prior_args': {'mini':1e2, 'maxi': 1e5}})
 
 model_params.append({'name': 'tage', 'N': 1,
-                        'isfree': True,
-                        'init': 0.1,
+                        'isfree': False,
+                        'init': 10**8.1/1e9,
                         'units': 'Gyr',
                         'prior_function':tophat,
                         'prior_args':{'mini':0.001, 'maxi':1.0}})
 
 model_params.append({'name': 'zmet', 'N': 1,
-                        'isfree': True,
-                        'init': -0.2,
+                        'isfree': False,
+                        'init': 0.0,
                         'units': r'$\log (Z/Z_\odot)$',
                         'prior_function': tophat,
                         'prior_args': {'mini':-1, 'maxi':0.19}})
@@ -102,8 +102,8 @@ model_params.append({'name': 'dust_curve', 'N': 1,
                         'units': None})
 
 model_params.append({'name': 'dust2', 'N': 1,
-                        'isfree': True,
-                        'init': 0.5,
+                        'isfree': False,
+                        'init': 0.65,
                         'units': r'$\tau_V$',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':2.5}})
@@ -135,7 +135,7 @@ model_params.append({'name': 'imf_type', 'N': 1,
                         'units': None})
 
 model_params.append({'name': 'imf3', 'N':1,
-                        'isfree': True,
+                        'isfree': False,
                         'init': 2.5,
                         'units': None,
                         'prior_function':tophat,
@@ -154,10 +154,8 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'isfree': True,
                         'init': 2.2,
                         'units': r'$\AA$',
-                        'prior_funtion': tophat,
-                        'prior_args': {'mini':0.0, 'maxi':3}})
-                        #'prior_function': priors.lognormal,
-                        #'prior_args': {'log_mean':np.log(2.2)+0.25**2, 'sigma':0.25}})
+                        'prior_function': priors.lognormal,
+                        'prior_args': {'log_mean':np.log(2.2)+0.25**2, 'sigma':0.25}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,
