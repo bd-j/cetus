@@ -154,7 +154,7 @@ model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'isfree': True,
                         'init': 1.0,
                         'units': r'$\AA$',
-                        'prior_funtion': tophat,
+                        'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':3}})
                         #'prior_function': priors.lognormal,
                         #'prior_args': {'log_mean':np.log(2.2)+0.05**2, 'sigma':0.05}})
