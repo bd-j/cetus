@@ -12,8 +12,8 @@
 ### PHAT
 #SBATCH -A TG-AST130057
 ### Job name
-#SBATCH -J 'imf_b216g267_miles'
+#SBATCH -J 'imf_b216g267_ckc'
 ### output and error logs
-#SBATCH -o imf_b216g267_miles_%j.out
-#SBATCH -e imf_b216g267_miles_%j.err
-ibrun python-mpi prospectr.py --param_file=parfiles/imf_b216g267_params.py --outfile=results/b216g267_miles_$SLURM_JOB_ID --nwalkers=510 --niter=2048
+#SBATCH -o imf_b216g267_ckc_%j.out
+#SBATCH -e imf_b216g267_ckc_%j.err
+ibrun python-mpi prospectr.py --param_file=parfiles/imf_b216g267_params.py --outfile=results/b216g267_ckc_$SLURM_JOB_ID --nwalkers=510 --niter=2048

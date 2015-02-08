@@ -145,7 +145,7 @@ model_params.append({'name': 'imf3', 'N':1,
 
 model_params.append({'name': 'zred', 'N':1,
                         'isfree': True,
-                        'init': 0.00001,
+                        'init': -3.5e-4,
                         'units': None,
                         'prior_function': tophat,
                         'prior_args': {'mini':-0.001, 'maxi':0.001}})
