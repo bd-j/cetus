@@ -37,7 +37,8 @@ def write_mock(mock, filename):
 
 if __name__ == "__main__":
     
-    model = get_fixed(run_params['param_file'], gp_jitter=0.0, gp_amplitude=0.0)
+    model = get_fixed(run_params['param_file'], gp_jitter=0.0, gp_amplitude=0.0,
+                      poly_coeffs=np.array([0.0,0.0]))
     real_obs = readspec.load_obs_mmt(**run_params)
     #make sure wavelength array is correct and remove the mask temporarily
     model.obs['wavelength'] = deepcopy(real_obs['wavelength'])
