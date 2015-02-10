@@ -14,3 +14,8 @@ hyades_logs/
 docs/*.log
 *.dvi
 *.pdf
+stampede_results/*mcmc
+stampede_results/*model
+stampede_results/*png
+fixed_params/spectra/*.p
+stampede_results/*/
