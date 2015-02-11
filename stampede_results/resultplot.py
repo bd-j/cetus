@@ -157,8 +157,8 @@ def add_wiggles(datadir="/work/03291/bdj314/code/cetus/data/", **extras):
 if __name__ == '__main__':
 
 
-    sflist = ['dao69_ckc_lowsn_4835362_1423452691_mcmc',
-              #'b216g267_ckc_4816596_1423124523_mcmc',
+    sflist = [#'dao69_ckc_lowsn_4835362_1423452691_mcmc',
+              'b216g267_ckc_4816596_1423124523_mcmc',
               'dao69_ckc_4816598_1423124059_mcmc'
               #'ap244_miles_4781921_1422547421_mcmc',
               #'ap552_miles_4781922_1422546888_mcmc',

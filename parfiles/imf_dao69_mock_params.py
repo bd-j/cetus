@@ -91,6 +91,8 @@ elif wiggles:
 obs['phot_mask'] = np.array([True, True, True, True, False, False])
 # Mask Halpha+NII
 obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
+# add 5% absolute calibration uncertainty
+obs['maggies_unc'] = np.sqrt(obs['maggies_unc']**2 +( 0.05 * obs['maggies'])**2)
 
 #############
 # MODEL_PARAMS
