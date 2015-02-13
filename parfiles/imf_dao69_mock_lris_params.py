@@ -3,16 +3,40 @@ from copy import deepcopy
 import numpy as np
 from sedpy import attenuation
 from bsfh import priors, sedmodel, elines
-from bsfh.datautils import load_obs_mmt
+from bsfh.datautils import load_obs_mmt, load_obs_lris
 tophat = priors.tophat
 import pickle
+
+def add_wiggles(datadir="/work/03291/bdj314/code/cetus/data/", **extras):
+    pars = {'phottable':datadir + "f2_apcanfinal_6phot_v2.fits",
+            'objname':'DAO69',
+            'wlo':3750., 'whi':7200.
+            }
+    calname = datadir + "mmt/nocal/223.DAO69.s.fits"
+    uncalname = datadir + "mmt/nocal/223.DAO69.v.fits"
+            
+    cal = load_obs_mmt(filename=calname, **pars)
+    uncal = load_obs_mmt(filename=uncalname, **pars)
+    calibration = (uncal['spectrum']/cal['spectrum'])#[cal['mask']]
+    calibration[~np.isfinite(calibration)] = 0
+    return cal['wavelength'], calibration
+    
+def add_poly(obs, c, norm_band_name = 'f475w', **extras):
+    norm_band = [i for i,f in enumerate(obs['filters']) if norm_band_name in f.name][0]
+    c = np.array(c)
+    x = obs['wavelength']/obs['filters'][norm_band].wave_effective - 1.0
+    poly = np.zeros_like(x)
+    powers = np.arange( 3 ) 
+    poly = (x[None,:] ** powers[:,None] * c[:,None]).sum(axis = 0)
+    return poly
+
 
 #############
 # RUN_PARAMS
 #############
  
 run_params = {'verbose':True,
-              'outfile':'results/b216g267_cal_miles',
+              'outfile':'results/dao69_mock',
               'do_powell': False,
               'ftol':0.5e-4, 'maxfev':10000,
               'nwalkers':64, #'walker_factor':4
@@ -26,12 +50,17 @@ run_params = {'verbose':True,
               'normalize_spectrum':True,
               'norm_band_name':'f475w',
               'rescale':True,
-              'objname': 'B216-G267',
-              'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/129.B216-G267.s.fits',
-              'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
-              'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits',
-              'wlo':3750.,
-              'whi':7200.
+              'objname': 'DAO69',
+              'filename':'/work/03291/bdj314/code/cetus/data/mock/dao69_mock_lris_noiseless.p',
+              'datadir': '/work/03291/bdj314/code/cetus/data/',
+              #'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
+              #'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits',
+              'wlo':3550.,
+              'whi':5540.,
+              'mock_snr_factor': 1.0,
+              'noiseless': True,
+              'add_mock_poly': [0.0, 0.2, -1],
+              'add_wiggles': True
               }
 
 if 'bjohnson' in os.getenv('HOME'):
@@ -42,10 +71,31 @@ if 'bjohnson' in os.getenv('HOME'):
 ############
 # OBS
 #############
-obs = load_obs_mmt(**run_params)
+#obs = load_obs_mmt(**run_params)
+
+amock = pickle.load( open(run_params['filename']))
+obs = amock['obs']
+mockpolypar = run_params.get('add_mock_poly', None)
+wiggles = run_params.get('add_wiggles', False)
+if (mockpolypar is not None) and (wiggles is False):
+    poly = np.exp(add_poly(obs, mockpolypar, **run_params))
+    obs['spectrum'] *= poly
+    obs['unc'] *= poly
+    obs['calibration'] = poly
+elif wiggles:
+    cal_wave, cal_wiggles = add_wiggles(**run_params)
+    x = np.linspace(0,1, len(obs['wavelength']))
+    xc = np.linspace(0,1, len(cal_wave))
+    cal_wiggles = np.interp(x, xc, cal_wiggles)
+    obs['spectrum'] *= cal_wiggles
+    obs['unc'] *= cal_wiggles
+    obs['calibration'] = cal_wiggles
+
 obs['phot_mask'] = np.array([True, True, True, True, False, False])
 # Mask Halpha+NII
 obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
+# add 5% absolute calibration uncertainty
+obs['maggies_unc'] = np.sqrt(obs['maggies_unc']**2 +( 0.05 * obs['maggies'])**2)
 
 #############
 # MODEL_PARAMS
@@ -68,22 +118,22 @@ model_params.append({'name': 'lumdist', 'N': 1,
 ###### SFH ################
 
 model_params.append({'name': 'mass', 'N': 1,
-                     'isfree': False,
-                     'init': 10**4.0,
+                     'isfree': True,
+                     'init': 10**3.9,
                      'units': r'M$_\odot$',
                      'prior_function': tophat,
                      'prior_args': {'mini':1e2, 'maxi': 1e5}})
 
 model_params.append({'name': 'tage', 'N': 1,
-                        'isfree': False,
-                        'init': 10**8.1/1e9,
+                        'isfree': True,
+                        'init': 0.03,
                         'units': 'Gyr',
                         'prior_function':tophat,
                         'prior_args':{'mini':0.001, 'maxi':1.0}})
 
 model_params.append({'name': 'zmet', 'N': 1,
-                        'isfree': False,
-                        'init': 0.0,
+                        'isfree': True,
+                        'init': -0.2,
                         'units': r'$\log (Z/Z_\odot)$',
                         'prior_function': tophat,
                         'prior_args': {'mini':-1, 'maxi':0.19}})
@@ -101,8 +151,8 @@ model_params.append({'name': 'dust_curve', 'N': 1,
                         'units': None})
 
 model_params.append({'name': 'dust2', 'N': 1,
-                        'isfree': False,
-                        'init': 0.65,
+                        'isfree': True,
+                        'init': 0.5,
                         'units': r'$\tau_V$',
                         'prior_function': tophat,
                         'prior_args': {'mini':0.0, 'maxi':2.5}})
@@ -134,7 +184,7 @@ model_params.append({'name': 'imf_type', 'N': 1,
                         'units': None})
 
 model_params.append({'name': 'imf3', 'N':1,
-                        'isfree': False,
+                        'isfree': True,
                         'init': 2.5,
                         'units': None,
                         'prior_function':tophat,
@@ -144,17 +194,19 @@ model_params.append({'name': 'imf3', 'N':1,
 
 model_params.append({'name': 'zred', 'N':1,
                         'isfree': True,
-                        'init': -1.8e-4,
+                        'init': 0.00001,
                         'units': None,
                         'prior_function': tophat,
                         'prior_args': {'mini':-0.001, 'maxi':0.001}})
 
 model_params.append({'name': 'sigma_smooth', 'N': 1,
                         'isfree': True,
-                        'init': 2.2,
+                        'init': 1.0,
                         'units': r'$\AA$',
-                        'prior_function': priors.lognormal,
-                        'prior_args': {'log_mean':np.log(2.2)+0.25**2, 'sigma':0.25}})
+                        'prior_function': tophat,
+                        'prior_args': {'mini':0.0, 'maxi':3}})
+                        #'prior_function': priors.lognormal,
+                        #'prior_args': {'log_mean':np.log(2.2)+0.05**2, 'sigma':0.05}})
 
 model_params.append({'name': 'smooth_velocity', 'N': 1,
                         'isfree': False,

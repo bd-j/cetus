@@ -6,16 +6,37 @@ from bsfh import model_setup, sps_basis, readspec
 sps = sps_basis.StellarPopBasis(compute_vega_mags=False)
 gp = GaussianProcess(None, None)
 
-run_params = {'param_file': '../imf_dao69_fixedparams.py',
+if len(sps.wavelengths) > 6.5e3:
+    library = 'ckc'
+else:
+    library = 'miles'
+
+
+run_params_mmt = {'param_file': '../imf_dao69_fixedparams.py',
               'objname': 'DAO69',
+              'instrument':'mmt',
               'filename':'/work/03291/bdj314/code/cetus/data/mmt/nocal/223.DAO69.s.fits',
               'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
               'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits'    
     }
+
+run_params_lris = {'param_file': '../imf_dao69_fixedparams.py',
+              'objname': 'DAO69',
+              'instrument':'lris',
+              'filename':'/work/03291/bdj314/code/cetus/data/lris/LRIS_B15.15.2013CL-467.blue.1d.fits',
+              'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
+              'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits'    
+    }
+
+run_params = run_params_lris
+    
 if 'bjohnson' in os.getenv('HOME'):
-    for k, v in run_params.iteritems():
+    for k, v in run_params_mmt.iteritems():
         if type(v) is str:
-            run_params[k] = v.replace('work/03291/bdj314/code','Users/bjohnson/Projects')
+            run_params_mmt[k] = v.replace('work/03291/bdj314/code','Users/bjohnson/Projects')
+    for k, v in run_params_lris.iteritems():
+        if type(v) is str:
+            run_params_lris[k] = v.replace('work/03291/bdj314/code','Users/bjohnson/Projects')
 
 
 def get_fixed(param_file, **kwargs):
@@ -38,8 +59,11 @@ def write_mock(mock, filename):
 if __name__ == "__main__":
     
     model = get_fixed(run_params['param_file'], gp_jitter=0.0, gp_amplitude=0.0,
-                      poly_coeffs=np.array([0.0,0.0]))
-    real_obs = readspec.load_obs_mmt(**run_params)
+                    poly_coeffs=np.array([0.0,0.0]))
+    #real_obs = readspec.load_obs_mmt(**run_params_mmt)
+    print(run_params_lris['crosstable'])
+    real_obs = readspec.load_obs_lris(**run_params_lris)
+    
     #make sure wavelength array is correct and remove the mask temporarily
     model.obs['wavelength'] = deepcopy(real_obs['wavelength'])
     model.obs['mask'] = np.ones(len(real_obs['wavelength']), dtype= bool)
@@ -57,8 +81,9 @@ if __name__ == "__main__":
     amock = {}
     amock['added_noise'] = False
     amock['obs'] = obs
+    amock['library'] = library
     amock['mock_params'] = deepcopy(model.params)
-    outname = "{}_noiseless.p".format(run_params['param_file'].replace('_fixedparams.py','_mock').replace('../imf_',''))
+    outname = "{0}_{1}_noiseless.p".format(run_params['param_file'].replace('_fixedparams.py','_mock').replace('../imf_',''), run_params['instrument'])
     outname = "/Users/bjohnson/Projects/cetus/data/mock/"+outname
                
     write_mock(amock, outname)
