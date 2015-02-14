@@ -10,7 +10,6 @@ from bsfh.gp import GaussianProcess
 sps = sps_basis.StellarPopBasis()
 gp = GaussianProcess(None, None)
 
-
 def add_wiggles(datadir="/work/03291/bdj314/code/cetus/data/", **extras):
     from bsfh.datautils import load_obs_mmt
 
@@ -25,7 +24,6 @@ def add_wiggles(datadir="/work/03291/bdj314/code/cetus/data/", **extras):
     uncal = load_obs_mmt(filename=uncalname, **pars)
     calibration = (uncal['spectrum']/cal['spectrum'])[cal['mask']]
     return calibration
-
 
 def comp_samples(thetas, model):
     specvecs =[]
@@ -183,7 +181,7 @@ if __name__ == "__main__":
     resfile = ('imf_dmock_snrx2_nolines_wnewpoly_polydata_1421277554_mcmc',
                'imf_dmock_snrx2_nolines_wnewpoly_polydata_1421225304_mcmc')
 
-    calvec = add_wiggles(datadir='/Users/bjohnson/Projects/cetus/data/')
+    #calvec = add_wiggles(datadir='/Users/bjohnson/Projects/cetus/data/')
 
     i=0
     res, pr, mod = bread.read_pickles(resfile[i],
@@ -192,7 +190,8 @@ if __name__ == "__main__":
     thetas, start, samples = theta_samples(res, samples=fsamples, start=0.75, thin=1)
     mwave, mospec, mounc, specvecs = comp_samples(thetas, mod)
     pwave, mosed, mosed_unc, pvecs = comp_samples_phot(thetas, mod)
-    
+
+    calvec = mod.obs['calibration']
     norm = mod.params['normalization_guess'] * mod.obs['scale']
 
     fig = pl.figure(figsize=(10,8))

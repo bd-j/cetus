@@ -6,11 +6,10 @@ from bsfh import model_setup, sps_basis, readspec
 sps = sps_basis.StellarPopBasis(compute_vega_mags=False)
 gp = GaussianProcess(None, None)
 
-if len(sps.wavelengths) > 6.5e3:
+if len(sps.ssp.wavelengths) > 6.5e3:
     library = 'ckc'
 else:
     library = 'miles'
-
 
 run_params_mmt = {'param_file': '../imf_dao69_fixedparams.py',
               'objname': 'DAO69',
@@ -60,10 +59,11 @@ if __name__ == "__main__":
     
     model = get_fixed(run_params['param_file'], gp_jitter=0.0, gp_amplitude=0.0,
                     poly_coeffs=np.array([0.0,0.0]))
-    #real_obs = readspec.load_obs_mmt(**run_params_mmt)
-    print(run_params_lris['crosstable'])
-    real_obs = readspec.load_obs_lris(**run_params_lris)
-    
+    if run_params['instrument'] is 'mmt':
+        real_obs = readspec.load_obs_mmt(**run_params_mmt)
+    elif run_params['instrument'] is 'lris':
+        real_obs = readspec.load_obs_lris(**run_params_lris)
+        model.params['sigma_smooth'] = 1.3
     #make sure wavelength array is correct and remove the mask temporarily
     model.obs['wavelength'] = deepcopy(real_obs['wavelength'])
     model.obs['mask'] = np.ones(len(real_obs['wavelength']), dtype= bool)
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     amock['obs'] = obs
     amock['library'] = library
     amock['mock_params'] = deepcopy(model.params)
-    outname = "{0}_{1}_noiseless.p".format(run_params['param_file'].replace('_fixedparams.py','_mock').replace('../imf_',''), run_params['instrument'])
+    outname = "{0}_{1}_{2}_noiseless.p".format(run_params['param_file'].replace('_fixedparams.py','_mock').replace('../imf_',''), library, run_params['instrument'])
     outname = "/Users/bjohnson/Projects/cetus/data/mock/"+outname
                
     write_mock(amock, outname)

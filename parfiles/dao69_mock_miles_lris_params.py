@@ -51,11 +51,11 @@ run_params = {'verbose':True,
               'norm_band_name':'f475w',
               'rescale':True,
               'objname': 'DAO69',
-              'filename':'/work/03291/bdj314/code/cetus/data/mock/dao69_mock_lris_noiseless.p',
+              'filename':'/work/03291/bdj314/code/cetus/data/mock/dao69_mock_miles_lris_noiseless.p',
               'datadir': '/work/03291/bdj314/code/cetus/data/',
               #'phottable':'/work/03291/bdj314/code/cetus/data/apdata-cluster_6phot_v4.fits',
               #'crosstable': '/work/03291/bdj314/code/cetus/data/f2_apmatch_known.fits',
-              'wlo':3550.,
+              'wlo':3400.,
               'whi':5540.,
               'mock_snr_factor': 1.0,
               'noiseless': True,
@@ -75,6 +75,7 @@ if 'bjohnson' in os.getenv('HOME'):
 
 amock = pickle.load( open(run_params['filename']))
 obs = amock['obs']
+obs['mock_params'] = amock['mock_params']
 mockpolypar = run_params.get('add_mock_poly', None)
 wiggles = run_params.get('add_wiggles', False)
 if (mockpolypar is not None) and (wiggles is False):
@@ -87,13 +88,14 @@ elif wiggles:
     x = np.linspace(0,1, len(obs['wavelength']))
     xc = np.linspace(0,1, len(cal_wave))
     cal_wiggles = np.interp(x, xc, cal_wiggles)
-    #obs['spectrum'] *= cal_wiggles
-    #obs['unc'] *= cal_wiggles
-    #obs['calibration'] = cal_wiggles
+    obs['spectrum'] *= cal_wiggles
+    obs['unc'] *= cal_wiggles
+    obs['calibration'] = cal_wiggles
 
+    
 obs['phot_mask'] = np.array([True, True, True, True, False, False])
 # Mask Halpha+NII
-obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
+#obs['mask'] *= ~((obs['wavelength'] > 6550) &  (obs['wavelength'] < 6590))
 # add 5% absolute calibration uncertainty
 obs['maggies_unc'] = np.sqrt(obs['maggies_unc']**2 +( 0.05 * obs['maggies'])**2)
 
