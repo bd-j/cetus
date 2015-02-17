@@ -1,0 +1,38 @@
+
+\documentclass{article}
+\usepackage{natbib}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+
+\begin{document}
+
+
+
+\section{ Computational Methodology and Algorithms}
+We use the Flexible Stellar Population Synthesis \citep[FSPS][]{fsps} code for computing the spectrum and photometry of stellar populations, combined with the \texttt{emcee} code for MCMC sampling of posterior probability function to infer the physical parameters of observed stellar clusters.  Parallelization is achieved during the MCMC sampling.
+
+\subsection{FSPS}
+FSPS is a Fortran code used to generate flexible, state of the art models of the spectra of stellar populations.  It uses tabulated stellar isochrones and a user defined initial mass function (IMF) to calculate the number of stars with different physical properties.  Tabulated spectra are then combined with weighting by the relative number of stars of each spectral type.  In a separate step dust extinction is applied, and the spectrum is convolved with a Gaussian to model the spectrograph resolution.  All tables are loaded into memory at the start of the code, so that there is no I/O during code execution.  Efforts have been made to speed this code up as much as possible.
+
+XXX Something here about compiler flags? XXX
+
+We use light Python bindings to the FORTRAN code, generated with f2py.  We have tested that the Python bindings do not add significant computational time, which is dominated by interpolation and integration within the FSPS Fortran code.
+
+\subsection{Flexible calibration model}
+For real data it is necessary to model the uncertain spectral calibration.  To do this we use a polynomial combined with a Gaussian Process \citep[e.g.,][]{RW} to model the covariance between the fluxes at nearby wavelengths.  Inversion of the covariance matrix is accomplished via \texttt{Scipy}'s Cholesky decomposition algorithms, which in turn use the Intel MKL library.
+
+\subsection{MCMC sampling: \texttt{emcee}}
+\label{sec:emcee}
+\texttt{emcee} is a Python implementation of the affine-invariant ensemble MCMC sampling scheme of \cite{goodman_weare}.  It opertes via an ensemble of ``walkers'' that move in the model parameter space, where the new parameter position for a each walker is based on the posterior probability of the parameters at other walker positions.   This process is iterated until the distribution of walker positions converges to a stable distribution. The number of iterations $N_{iterations}$ required depends on the initial positions of the walkers, the number of walkers $N_{walkers}$, and the quality of the data.  The total number of posterior probability evalutions is $N_{walkers} \times N_{iterations}$.
+
+In the \texttt{emcee} implementation, at each iteration the ensemble of walkers is split in 2 equal subsamples. The posterior probabilities at the positions of the walkers in one subsample are computed in parallel, and are then used to propose new parameter positions for the other subsample. Using MPI, communication of parameter positions and posterior probabilities between processors takes place twice per iteration. Since the computation of the posterior probabilities dominates the total run time of the code, large speedups can be obtained by increasing the number of processors up to $N_{walkers}/2 + 1$.  
+
+With tests on Stampede we have found, for our mock data and for $N_{walkers}$ between $\sim$126 and 510, that increasing $N_{walkers}$ (and thus the number of processors that can be used) also decreases the number of iterations required before the distribution of walkers converges.  That is, for 2 times as many walkers, the number of iterations required for convergence decreases by at least a factor of 2, thus maintaining or even decreasing the total problem size.  We are currently investigating the optimal number of walkers - at very low numbers of iterations ($\sim 100$) we expect the distribution to still be evolving even for exceedingly high numbers of walkers.
+
+\subsubsection{Load Balancing}
+The \texttt{emcee} offers the option of load balancing the computation of the posterior probabilities when there are more than twice as many walkers as there are processors.  However, we have found that the time for the posterior probability computation does not vary by more than 10\%, and cannot be predicted easily. Thus load balancing does not provide a significant speedup. 
+
+\section{Benchmarks and Scaling}
+In our tests the \texttt{emcee} algorithm scales well with the number of processors as long as the number of walkers is an integer multiple of the number of processors minus one.  This is because the work is completely dominated by the calculation of the of the posterior probabilites, which requires both generation of the stellar population model and inversion of $\sim 2\mbox{k} \times 2\mbox{k}$ matrices.  Increasing the number of walkers also decreases the number of iterations required for convergence, keeping the total problem size fixed (or even making it smaller)
+
+\end{document}

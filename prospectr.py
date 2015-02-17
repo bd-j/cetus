@@ -73,8 +73,13 @@ def lnprobfn(theta, mod):
             gp.wave, gp.sigma = mod.obs['wavelength'][mask], mod.obs['unc'][mask]
             #use a residual in log space
             log_mu = np.log(mu)
-            #polynomial in the log
-            log_cal = (mod.calibration(theta))
+            cal = (mod.calibration(theta))
+            if mod.params.get('cal_type', 'exp_poly') is 'poly':
+                #polynomial
+                log_cal = np.log(cal)
+            else:
+                #polynomial in the log
+                log_cal = cal
             delta = (mod.obs['spectrum'] - log_mu - log_cal)[mask]
             gp.factor(mod.params['gp_jitter'], mod.params['gp_amplitude'],
                       mod.params['gp_length'], check_finite=False, force=False)
@@ -88,7 +93,7 @@ def lnprobfn(theta, mod):
                                                      dtype= bool))
             jitter = mod.params.get('phot_jitter',0)
             maggies = mod.obs['maggies']
-            phot_var = (mod.obs['maggies_unc'] + jitter)**2
+            phot_var = mod.obs['maggies_unc']**2 + (jitter*mod.obs['maggies'])**2
             lnp_phot =  -0.5*( (phot - maggies)**2 / phot_var )[pmask].sum()
             lnp_phot +=  -0.5*np.log(phot_var[pmask]).sum()
         else:
@@ -134,9 +139,14 @@ if __name__ == "__main__":
     _ = model_setup.parse_args(sys.argv, argdict=model.run_params)
     model.run_params['sys.argv'] = sys.argv
     rp = model.run_params #shortname
-    initial_theta = model.initial_theta
+    model.params['cal_type'] = rp.get('cal_type', 'exp_poly')
+    if model.params['cal_type'] is 'poly':
+        model.rescale_parameter('spec_norm', lambda x: np.exp(x))
+        model.configure()
+    initial_theta = np.copy(model.initial_theta)
     if rp['verbose']:
         print(model.params)
+	print(model.initial_theta)
     if rp.get('debug', False):
         try:
             pool.close()
@@ -147,21 +157,25 @@ if __name__ == "__main__":
     #################
     #INITIAL GUESS(ES) USING POWELL MINIMIZATION
     #################
-    if rp['verbose']:
-        print('minimizing chi-square...')
-    ts = time.time()
-    powell_opt = {'ftol': rp['ftol'], 'xtol':1e-6, 'maxfev':rp['maxfev']}
-    powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
-                                       method ='powell', opts=powell_opt,
-                                       pool = pool, nthreads = rp.get('nthreads',1))
+    if rp['do_powell']:
+        if rp['verbose']:
+            print('minimizing chi-square...')
+        ts = time.time()
+        powell_opt = {'ftol': rp['ftol'], 'xtol':1e-4, 'maxfev':rp['maxfev']}
+        powell_guesses, pinit = utils.pminimize(chisqfn, model, initial_theta,
+                                        method ='powell', opts=powell_opt,
+                                        pool = pool, nthreads = rp.get('nthreads',1))
     
-    best = np.argmin([p.fun for p in powell_guesses])
-    best_guess = powell_guesses[best]
-    pdur = time.time() - ts
-    
-    if rp['verbose']:
-        print('done Powell in {0}s'.format(pdur))
-
+        best = np.argmin([p.fun for p in powell_guesses])
+        best_guess = powell_guesses[best]
+        pdur = time.time() - ts
+        initial_center = best_guess.x
+        if rp['verbose']:
+            print('done Powell in {0}s'.format(pdur))
+    else:
+        initial_center = initial_theta
+	powell_guesses = None 
+      	pdur = 0.0 
     ###################
     #SAMPLE
     ####################
@@ -169,7 +183,6 @@ if __name__ == "__main__":
     if rp['verbose']:
         print('emcee sampling...')
     tstart = time.time()
-    initial_center = best_guess.x
     esampler = utils.run_emcee_sampler(model, lnprobfn, initial_center, rp, pool = pool)
     edur = time.time() - tstart
     if rp['verbose']:
@@ -178,6 +191,13 @@ if __name__ == "__main__":
     ###################
     # PICKLE OUTPUT
     ###################
+    #from fsps import fsps_vers
+    fsps_vers = 178
+    if len(sps.ssp.wavelengths) > 1e4:
+        stellib = 'CKC14'
+    else:
+        stellib = 'MILES'
+    model.run_params['fsps_vers'] = (fsps_vers, stellib)
     write_results.write_pickles(model, esampler, powell_guesses,
                                 toptimize=pdur, tsample=edur,
                                 sampling_initial_center=initial_center)

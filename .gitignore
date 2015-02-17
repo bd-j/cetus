@@ -1,3 +1,6 @@
+*err
+*out
+test*dat
 misc/*
 detritus/
 .DS_Store
@@ -7,3 +10,15 @@ dali_logs/
 odyssey_logs/
 hyades_logs/
 *pyc
+*.aux
+docs/*.log
+*.dvi
+*.pdf
+stampede_results/*mcmc
+stampede_results/*model
+stampede_results/*png
+fixed_params/spectra/*.p
+stampede_results/*/
+fixed_params/*/*png
+data/lris/*
+stochastic/*png
