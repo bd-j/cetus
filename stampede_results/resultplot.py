@@ -158,7 +158,8 @@ if __name__ == '__main__':
 
 
     sflist = [#'dao69_ckc_lowsn_4835362_1423452691_mcmc',
-              'dao69_ckc_mock_4846825_1423747216_mcmc',
+              'dao69_miles_mock_lris_4860079_1424037705_mcmc'
+              #'dao69_ckc_mock_4846825_1423747216_mcmc',
               #'b216g267_ckc_4816596_1423124523_mcmc',
               #'dao69_ckc_4816598_1423124059_mcmc'
               #'ap244_miles_4781921_1422547421_mcmc',
